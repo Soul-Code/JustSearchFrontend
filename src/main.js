@@ -1,9 +1,9 @@
 import Vue from "vue";
 
 import MuseUI from "muse-ui";
-import Toast from "muse-ui-toast";
 import "muse-ui/dist/muse-ui.css";
 
+import Toast from "muse-ui-toast";
 import VueRouter from "vue-router";
 import { routes } from "./routes.js";
 
