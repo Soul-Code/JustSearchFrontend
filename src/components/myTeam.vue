@@ -4,23 +4,19 @@
             <mu-flex wrap="wrap" v-bind:justify-content="isPc?'between':'center'">
                 <mu-flex fill>
                     <mu-card class="card-info" style="">
-                        <!-- <mu-card-media title="Image Title" sub-title="Image Sub Title">
-                            <img src="../assets/logo.png">
-                        </mu-card-media> -->
-                        <mu-card-title class="title-name" title="姓名">
+                        <mu-card-title class="title-name" :title="userInfo.name">
                         </mu-card-title>
                         <mu-list dense>
                             <mu-list-item>
-                                当前个人积分：50分
+                                当前个人积分：{{userInfo.score}}分
                             </mu-list-item>
                             <mu-list-item>
-                                QQ：123456789
+                                QQ：{{userInfo.qq}}
                             </mu-list-item>
                             <mu-list-item>
-                                TEL：18111111111
+                                TEL：{{userInfo.tel}}
                             </mu-list-item>
                         </mu-list>
-                        <!-- <mu-card-title class="title-name" title="我的队伍："></mu-card-title> -->
                         <mu-list>
                             <mu-sub-header>我的队伍</mu-sub-header>
                             <mu-list-item avatar button :ripple="true">
@@ -30,8 +26,8 @@
                                     </mu-avatar>
                                 </mu-list-item-action>
                                 <mu-list-item-content>
-                                    <mu-list-item-title>队伍名称</mu-list-item-title>
-                                    <mu-list-item-sub-title>当前队伍积分：99分</mu-list-item-sub-title>
+                                    <mu-list-item-title>{{userInfo.team.name}}</mu-list-item-title>
+                                    <mu-list-item-sub-title>当前队伍积分：{{userInfo.team.score}}分</mu-list-item-sub-title>
                                 </mu-list-item-content>
                                 <mu-list-item-action>
                                     <mu-tooltip placement="top" content="退出队伍">
@@ -41,37 +37,23 @@
                                     </mu-tooltip>
                                 </mu-list-item-action>
                             </mu-list-item>
-                            <mu-list-item avatar :ripple="true" button>
+                            
+                            <mu-list-item v-for="mem in userInfo.team.mems" :key="mem.id" avatar :ripple="true" button>
                                 <mu-list-item-action class="avatar-member">
                                     <mu-icon value="person"></mu-icon>
                                 </mu-list-item-action>
                                 <mu-list-item-content>
-
-                                    <mu-list-item-title>组员1</mu-list-item-title>
+                                    <mu-list-item-title>{{mem.name}}</mu-list-item-title>
                                 </mu-list-item-content>
                                 <mu-list-item-action>
-                                    <!-- <mu-list-item-after-text>15 min</mu-list-item-after-text> -->
-
                                     <mu-tooltip placement="top" content="踢出队员">
                                         <mu-button icon color="error">
                                             <mu-icon value="close"></mu-icon>
                                         </mu-button>
                                     </mu-tooltip>
-                                    <!-- <mu-checkbox color="yellow700" v-model="selects" value="value1" uncheck-icon="star_border" checked-icon="close"></mu-checkbox> -->
                                 </mu-list-item-action>
                             </mu-list-item>
                         </mu-list>
-
-                        <!-- <mu-card-text>
-                            散落在指尖的阳光，我试着轻轻抓住光影的踪迹，它却在眉宇间投下一片淡淡的阴影。
-                            调皮的阳光掀动了四月的心帘，温暖如约的歌声渐起。
-                            似乎在诉说着，我也可以在漆黑的角落里，找到阴影背后的阳光，
-                            找到阳光与阴影奏出和谐的旋律。我要用一颗敏感赤诚的心迎接每一缕滑过指尖的阳光！
-                        </mu-card-text>
-                        <mu-card-actions>
-                            <mu-button flat>Action 1</mu-button>
-                            <mu-button flat>Action 2</mu-button>
-                        </mu-card-actions> -->
                     </mu-card>
                 </mu-flex>
                 <mu-flex fill>
@@ -94,7 +76,7 @@
                                 </mu-step-label>
                                 <mu-step-content>
                                     <p>
-                                        参加比赛的小可爱们，你们可以选择创建属于自己的队伍（你将成为队长），或者选择加入别人的队伍~
+                                        参加比赛的小可爱们，恭喜你们报名成功啦。现在的你们可以选择<strong>创建</strong>属于自己的队伍（你将成为队长），或者选择<strong>加入</strong>别人的队伍~
                                     </p>
                                     <mu-button class="demo-step-button" @click="vhandleNext" color="primary">加入队伍</mu-button>
                                     <mu-button class="demo-step-button" @click="vhandleNext" color="primary">创建队伍</mu-button>
@@ -172,7 +154,21 @@ export default {
       vactiveStep: 0,
       isTeamed: false,
       fullWidth: document.documentElement.clientWidth,
-      isPc: document.documentElement.clientWidth > 1000
+      isPc: document.documentElement.clientWidth > 1000,
+      userInfo: {
+        id: 1,
+        name: "刘成帅",
+        qq: "928735468",
+        tel: "13177764893",
+        score: 99,
+        team: {
+          id: 1,
+          name: "刚哥最帅队",
+          score: 101,
+          leader: { id: 1, name: "刘成帅" },
+          mems: [{ id: 2, name: "李志伟" }, { id: 3, name: "GG" }]
+        }
+      }
     };
   },
   computed: {
