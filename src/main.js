@@ -1,18 +1,44 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
+import Vue from "vue";
 
-import App from './App.vue'
-import { routes } from './routes.js'
+import MuseUI from "muse-ui";
+import Toast from "muse-ui-toast";
+import "muse-ui/dist/muse-ui.css";
 
+import VueRouter from "vue-router";
+import { routes } from "./routes.js";
+
+import { theme } from "muse-ui";
+
+import App from "./App.vue";
+
+Vue.use(MuseUI);
 Vue.use(VueRouter);
+Vue.use(Toast);
+Vue.prototype.url = App.url;
+
+theme.add(
+  "teal",
+  {
+    primary: "#009688",
+    secondary: "#ff4081",
+    success: "#4caf50",
+    warning: "#ffeb3b"
+  },
+  "light"
+);
+
+theme.use("teal");
 
 const router = new VueRouter({
-  mode:'history',
+  mode: "history",
   routes
 });
 
-new Vue({
-  el: '#app',
+var app = new Vue({
+  el: "#app",
   router,
-  render: h => h(App)
-})
+  data:{
+    isLogin
+  },
+  render: h => h(App),
+});

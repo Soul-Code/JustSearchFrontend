@@ -1,17 +1,21 @@
 <template>
-  <div class="container">
+  <div>
     <app-header></app-header>
-    <div class="row">
-      <div class="col-xs-12">
-        <router-view></router-view>
-      </div>
-    </div>
+    <mu-container>
+      <router-view></router-view>
+    </mu-container>
   </div>
 </template>
 
 <script>
 import Header from "./components/header.vue";
+var url = "";
+const debug = true;
+if (debug) url = "http://soulcode.cn:8080/justsoso/api/";
+else url = "https://soulcode.cn/justsoso/api/";
 export default {
+  url,
+  isLogin,
   components: {
     appHeader: Header
   }
@@ -19,7 +23,7 @@ export default {
 </script>
 
 <style>
-body{
-  padding: 70px
+.container {
+  height: 100%;
 }
 </style>

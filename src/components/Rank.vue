@@ -1,3 +1,3 @@
 <template>
-    <h1>组队</h1>
+    <h1>Rank</h1>
 </template>

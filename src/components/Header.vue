@@ -1,61 +1,108 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-    <div class="container">
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
-        <!-- <a class="navbar-brand" href="#">JustSearch</a> -->
-        <router-link class="nav-title navbar-brand" to="/">Just搜搜网络答题系统</router-link>
-        <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+  <div>
+    <mu-appbar v-if="!isPc" z-depth='0' color="grey800">
+      <mu-button v-if="!isPc" @click="open = !open" icon slot="left">
+        <mu-icon value="menu"></mu-icon>
+      </mu-button>
+      <router-link to="/justsoso" slot="left" class="title">
+        Just搜搜 | 网络答题系统
+      </router-link>
+      <mu-button v-if="!isLogin" to="/justsoso/Login" flat class="btn" slot="right">
+        登陆
+      </mu-button>
+      <mu-button v-if="isLogin" @click="logout" flat class="btn" slot="right">
+        退出登陆
+      </mu-button>
+    </mu-appbar>
 
-          <!-- <router-link class="nav-item" to="/" activeClass="active" tag="li">
-            <a class="nav-link">主页</a>
-          </router-link> -->
-          
-          <router-link class="nav-item" to="/Login" activeClass="active" tag="li">
-            <a class="nav-link">登陆</a>
+    <mu-appbar v-if="isPc" color="grey800">
+      <mu-container>
+        <mu-appbar z-depth='0' color="grey800">
+          <mu-button v-if="!isPc" icon slot="left">
+            <mu-icon value="menu"></mu-icon>
+          </mu-button>
+          <router-link to="/justsoso" slot="left" class="title">
+            Just搜搜 | 网络答题系统 PC端
           </router-link>
-          
-          <router-link class="nav-item" to="/Answer" activeClass="active" tag="li">
-            <a class="nav-link">答题</a>
-          </router-link>
+          <mu-tabs :value.sync="active" color='grey800' indicator-color='primary'>
+            <mu-tab to="/justsoso/Answer" class="tabs">答题</mu-tab>
+            <mu-tab to="/justsoso/Rank" class="tabs">排名</mu-tab>
+            <mu-tab to="/justsoso/myTeam" class="tabs">我的队伍</mu-tab>
+            <mu-tab to="/justsoso/Login" class="tabs">登陆</mu-tab>
+          </mu-tabs>
+          <mu-button round class="btn" color='primary' slot="right">
+            上传答案
+          </mu-button>
+          <mu-button v-if="isLogin" @click="logout" round class="btn" color="grey600" slot="right">
+            退出登陆
+          </mu-button>
+          <mu-button v-if="!isLogin" to="/justsoso/Login" round class="btn" color="grey600" slot="right">
+            登陆
+          </mu-button>
 
-          <router-link class="nav-item" to="/Team" activeClass="active" tag="li">
-            <a class="nav-link">队伍</a>
-          </router-link>
-
-        </ul>
-        <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
-          <!-- <router-link class="nav-item" to="/" activeClass="active" tag="li"> -->
-          <!-- <a class="nav-link">上传答案</a> -->
-          <li class="nav-item">
-            <button class="nav-btn btn btn-success" type="button">上传答案</button>
-          </li>
-          <!-- </router-link> -->
-          <!-- <router-link class="nav-item" to="/Login" activeClass="active" tag="li"> -->
-          <!-- <a class="nav-link">退出登陆</a> -->
-          <li class="nav-item">
-            <button class="nav-btn btn btn-secondary" type="button">退出登陆</button>
-          </li>
-          <!-- </router-link> -->
-        </ul>
-
-        <!-- <form class="form-inline my-2 my-lg-0">
-          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        </form> -->
-      </div>
-    </div>
-  </nav>
+        </mu-appbar>
+      </mu-container>
+    </mu-appbar>
+    <mu-drawer :open.sync="open" :docked="docked" :right="position === 'right'">
+      <mu-list>
+        <mu-list-item button>
+          <mu-list-item-title>Menu Item 1</mu-list-item-title>
+        </mu-list-item>
+        <mu-list-item button>
+          <mu-list-item-title>Menu Item 2</mu-list-item-title>
+        </mu-list-item>
+        <mu-list-item @click="open = false" button>
+          <mu-list-item-title>Close</mu-list-item-title>
+        </mu-list-item>
+      </mu-list>
+    </mu-drawer>
+  </div>
 </template>
+<script>
+export default {
+  data() {
+    return {
+      //Drawer
+      docked: false,
+      open: false,
+      position: "left",
+
+      isLogin,
+      active: 0,
+      fullWidth: document.documentElement.clientWidth,
+      isPc: document.documentElement.clientWidth > 1000
+    };
+  },
+  mounted() {
+    const that = this;
+    this.active = this.$route.name;
+    window.onresize = () => {
+      return (() => {
+        window.fullHeight = document.documentElement.clientHeight;
+        that.fullHeight = window.fullHeight;
+        that.isPc = that.fullWidth > 1000;
+      })();
+    };
+  },
+  methods: {
+    logout() {
+      this.$toast.success("退出登陆成功！");
+    }
+  }
+};
+</script>
 <style>
-.nav-btn{
+.btn {
   margin-left: 6px;
-  margin-right: 6px
+  margin-right: 6px;
+  font-size: 1rem;
 }
-.nav-title{
-  margin-right: 15px;
+.title {
+  font-size: 1.1rem;
+  color: aliceblue;
+}
+.tabs {
+  font-size: 1rem;
 }
 </style>
 

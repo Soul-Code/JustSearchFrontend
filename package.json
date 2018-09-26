@@ -10,6 +10,9 @@
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
   },
   "dependencies": {
+    "axios": "^0.18.0",
+    "muse-ui": "^3.0.1",
+    "muse-ui-toast": "^0.3.0",
     "npm": "^6.4.1",
     "vue": "^2.5.11",
     "vue-router": "^3.0.1"
