@@ -9,17 +9,30 @@
   <link rel="stylesheet" href="/googlefont.css">
 </head>
 
-<body 
-style='font-family:"Microsoft YaHei",微软雅黑,"MicrosoftJhengHei",华文细黑,STHeiti,MingLiu; background-color: #eeeeee'>
+<body style='font-family:"Microsoft YaHei",微软雅黑,"MicrosoftJhengHei",华文细黑,STHeiti,MingLiu; background-color: #eeeeee'>
 
   <div id="app">
   </div>
   <script>
-    var isLogin = true
+    var isLogin = true;
+    var userInfo = {
+      id: 1,
+      name: "刘成帅",
+      avatar: "url",
+      qq: "928735468",
+      tel: "13177764893",
+      score: 99,
+      team: {
+        id: 1,
+        name: "刚哥最帅队",
+        score: 101,
+        leader: { id: 1, name: "刘成帅" },
+        mems: [{ id: 2, name: "李志伟" }, { id: 3, name: "GG" }]
+      }
+    };
   </script>
   <script src="/dist/build.js"></script>
 
 </body>
 
 </html>
-

@@ -38,7 +38,8 @@ var app = new Vue({
   el: "#app",
   router,
   data:{
-    isLogin
+    isLogin,
+    userInfo
   },
   render: h => h(App),
 });

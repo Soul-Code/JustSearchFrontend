@@ -15,7 +15,6 @@ if (debug) url = "http://soulcode.cn:8080/justsoso/api/";
 else url = "https://soulcode.cn/justsoso/api/";
 export default {
   url,
-  isLogin,
   components: {
     appHeader: Header
   }

@@ -37,7 +37,14 @@
                                     </mu-tooltip>
                                 </mu-list-item-action>
                             </mu-list-item>
-                            
+                            <mu-list-item avatar :ripple="true" button>
+                                <mu-list-item-action class="avatar-member">
+                                    <mu-icon value="person"></mu-icon>
+                                </mu-list-item-action>
+                                <mu-list-item-content>
+                                    <mu-list-item-title>{{userInfo.team.leader.name}}</mu-list-item-title>
+                                </mu-list-item-content>
+                            </mu-list-item>
                             <mu-list-item v-for="mem in userInfo.team.mems" :key="mem.id" avatar :ripple="true" button>
                                 <mu-list-item-action class="avatar-member">
                                     <mu-icon value="person"></mu-icon>
@@ -45,7 +52,7 @@
                                 <mu-list-item-content>
                                     <mu-list-item-title>{{mem.name}}</mu-list-item-title>
                                 </mu-list-item-content>
-                                <mu-list-item-action>
+                                <mu-list-item-action v-if="userInfo.team.leader.id == userInfo.id">
                                     <mu-tooltip placement="top" content="踢出队员">
                                         <mu-button icon color="error">
                                             <mu-icon value="close"></mu-icon>
@@ -92,7 +99,8 @@
                                         恭喜你已经拥有了自己的队伍哦，但是由于你的队伍成员不满三人，暂时无法参赛呢，你可以选择分享队伍，让更多的小伙伴加入哦~
                                         <br>
                                         <span style="color:red">
-                                            <strong> 注意！请慎重选择你的队友， 现场赛时会验证身份,一旦发现队伍人员不齐或者代替他人参赛者，主办方有权取消其比赛资格！
+                                            <strong> 注意！请慎重选择你的队友，一旦开始比赛，队友将不可更换。
+                                                现场赛时会验证身份，一旦发现代替他人参赛者，主办方有权取消其比赛资格！有队员来不了的同学会吃亏的哟~
                                             </strong>
                                         </span>
                                     </p>
@@ -152,23 +160,10 @@ export default {
   data() {
     return {
       vactiveStep: 0,
-      isTeamed: false,
+      isTeamed: true,
       fullWidth: document.documentElement.clientWidth,
       isPc: document.documentElement.clientWidth > 1000,
-      userInfo: {
-        id: 1,
-        name: "刘成帅",
-        qq: "928735468",
-        tel: "13177764893",
-        score: 99,
-        team: {
-          id: 1,
-          name: "刚哥最帅队",
-          score: 101,
-          leader: { id: 1, name: "刘成帅" },
-          mems: [{ id: 2, name: "李志伟" }, { id: 3, name: "GG" }]
-        }
-      }
+      userInfo
     };
   },
   computed: {

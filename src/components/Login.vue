@@ -102,7 +102,6 @@ export default {
   methods: {
     submit() {
       // let that = this;
-      console.log(this);
       this.$refs.form.validate().then(result => {
         console.log("form valid: ", result);
         if (result) {
@@ -114,6 +113,7 @@ export default {
               if (res.data.isOk) {
                 console.log("ok");
                 this.show_toast("登陆成功", 0);
+                this.$router.push("myTeam");
               } else {
                 console.log("not ok");
                 this.show_toast(res.data.errmsg, 1);
@@ -121,12 +121,12 @@ export default {
             })
             .catch(res => {
               console.log(res);
+              this.show_toast("服务器连接失败！", 1);
             });
         }
       });
     },
     clear() {
-      this.$toast.success("登陆成功！");
       this.$refs.form.clear();
       this.validateForm = {
         username: "",
