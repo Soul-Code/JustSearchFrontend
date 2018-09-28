@@ -4,6 +4,7 @@ import MuseUI from "muse-ui";
 import "muse-ui/dist/muse-ui.css";
 
 import Toast from "muse-ui-toast";
+//使用Vue原生路由
 import VueRouter from "vue-router";
 import { routes } from "./routes.js";
 
@@ -11,11 +12,28 @@ import { theme } from "muse-ui";
 
 import App from "./App.vue";
 
+//让axios携带csrf头和cookies
+import axios from "axios";
+axios.defaults.withCredentials = true;
+axios.interceptors.request.use(config => {
+  console.log(document.cookie);
+  config.headers["X-Requested-With"] = "XMLHttpRequest";
+  let regex = /.*csrftoken=([^;.]*).*$/;
+  config.headers["X-CSRFToken"] =
+    document.cookie.match(regex) === null
+      ? null
+      : document.cookie.match(regex)[1];
+  return config;
+});
+Vue.prototype.$axios = axios;
+
+
 Vue.use(MuseUI);
 Vue.use(VueRouter);
 Vue.use(Toast);
 Vue.prototype.url = App.url;
 
+//主题设置
 theme.add(
   "teal",
   {

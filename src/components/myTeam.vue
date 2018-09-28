@@ -10,14 +10,14 @@
                             <mu-list-item>
                                 当前个人积分：{{userInfo.score}}分
                             </mu-list-item>
-                            <mu-list-item>
+                            <mu-list-item v-if="userInfo.qq">
                                 QQ：{{userInfo.qq}}
                             </mu-list-item>
-                            <mu-list-item>
+                            <mu-list-item v-if="userInfo.tel">
                                 TEL：{{userInfo.tel}}
                             </mu-list-item>
                         </mu-list>
-                        <mu-list>
+                        <mu-list v-if="userInfo.team.id">
                             <mu-sub-header>我的队伍</mu-sub-header>
                             <mu-list-item avatar button :ripple="true">
                                 <mu-list-item-action>
@@ -72,12 +72,36 @@
                                 </mu-step-label>
                                 <mu-step-content>
                                     <p>
-                                        登陆成功，现在点击下面的按钮输入信息来报名~
+                                        <span v-if="!userInfo.tel">登陆成功，现在点击下面的按钮输入信息来报名~</span>
+                                        <span v-else>报名成功，您现在可以点击下面的按钮修改信息~</span>
                                     </p>
-                                    <mu-button class="demo-step-button" @click="vhandleNext" color="primary">点我报名</mu-button>
+                                    <mu-button class="demo-step-button" @click="regsiter" color="primary">
+                                        <span v-if="!userInfo.tel">点我报名</span>
+                                        <span v-else>修改信息</span>
+                                    </mu-button>
+                                    <mu-button flat class="demo-step-button" @click="vhandleNext">下一步</mu-button>
+
+                                    <mu-dialog :title="userInfo.tel?'修改信息':'请完善信息进行报名'" width="400px" max-width="80%" :esc-press-close="false" :overlay-close="false" :open.sync="openRegister">
+
+                                        <mu-form ref="form" :model="validateForm" class="mu-demo-form">
+                                            <mu-form-item label-float label="手机号" help-text="请保证手机号码通信畅通！" prop="tel" :rules="telRules">
+                                                <mu-text-field type="number" v-model="validateForm.tel" prop="tel"></mu-text-field>
+                                            </mu-form-item>
+                                            <mu-form-item class="lastone" label-float label="QQ" prop="qq" :rules="qqRules">
+                                                <mu-text-field type="number" v-model="validateForm.qq" prop="qq"></mu-text-field>
+                                            </mu-form-item>
+                                        </mu-form>
+
+                                        <mu-button slot="actions" @click="openRegister = false">返回</mu-button>
+                                        <mu-button slot="actions" color="success" @click="submit">
+                                            <span v-if="!userInfo.tel">确认报名</span>
+                                            <span v-else>确认修改</span>
+                                        </mu-button>
+                                    </mu-dialog>
+
                                 </mu-step-content>
                             </mu-step>
-                            <mu-step v-if="!isTeamed">
+                            <mu-step v-if="!userInfo.team.id">
                                 <mu-step-label>
                                     加入/创建队伍
                                 </mu-step-label>
@@ -85,12 +109,29 @@
                                     <p>
                                         参加比赛的小可爱们，恭喜你们报名成功啦。现在的你们可以选择<strong>创建</strong>属于自己的队伍（你将成为队长），或者选择<strong>加入</strong>别人的队伍~
                                     </p>
-                                    <mu-button class="demo-step-button" @click="vhandleNext" color="primary">加入队伍</mu-button>
-                                    <mu-button class="demo-step-button" @click="vhandleNext" color="primary">创建队伍</mu-button>
+                                    <mu-button class="demo-step-button" @click="joinTeam" color="primary">加入队伍</mu-button>
+                                    <mu-button class="demo-step-button" @click="createTeam" color="primary">创建队伍</mu-button>
+
+                                    <mu-dialog title="创建新的队伍" width="400px" max-width="80%" :esc-press-close="false" :overlay-close="false" :open.sync="openNewTeam">
+
+                                        <mu-form ref="form" :model="newTeamForm" class="mu-demo-form">
+                                            <mu-form-item label-float label="队伍名称" prop="teamname" :rules="teamnameRules">
+                                                <mu-text-field type="text" v-model="newTeamForm.teamname" prop="teamname"></mu-text-field>
+                                            </mu-form-item>
+
+                                            <mu-form-item label-float label="头像" prop="avatar" :rules="avatarRules">
+                                                <mu-text-field type="file" v-model="newTeamForm.avatar" prop="avatar"></mu-text-field>
+                                            </mu-form-item>
+                                        </mu-form>
+
+                                        <mu-button slot="actions" @click="openRegister = false">返回</mu-button>
+                                        <mu-button slot="actions" color="success" @click="submitCreate">确认创建</mu-button>
+                                    </mu-dialog>
+
                                     <mu-button flat class="demo-step-button" @click="vhandlePrev">上一步</mu-button>
                                 </mu-step-content>
                             </mu-step>
-                            <mu-step v-if="isTeamed">
+                            <mu-step v-if="userInfo.team.id">
                                 <mu-step-label>
                                     分享队伍
                                 </mu-step-label>
@@ -159,11 +200,50 @@
 export default {
   data() {
     return {
-      vactiveStep: 0,
+      vactiveStep: 1,
       isTeamed: true,
       fullWidth: document.documentElement.clientWidth,
       isPc: document.documentElement.clientWidth > 1000,
-      userInfo
+      userInfo,
+      openRegister: false,
+      openNewTeam: true,
+
+      telRules: [
+        { validate: val => !!val, message: "请填写手机号码" },
+        {
+          validate: val =>
+            /^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\d{8}$/.test(
+              val
+            ),
+          message: "手机号码有误，请确认输入是否正确"
+        }
+      ],
+      qqRules: [
+        { validate: val => !!val, message: "请填写qq号码" },
+        {
+          validate: val => val.length >= 6 && val.length <= 12,
+          message: "qq号码长度不正确"
+        }
+      ],
+      teamnameRules: [
+        { validate: val => !!val, message: "请填写队伍名称" },
+        {
+          validate: val =>
+            !/[`~@#$%^&*()+<>:"{},.\/;'·！#￥（——）：；“”‘、，|《。》、【】[\]]/.test(
+              val
+            ),
+          message: "队伍名称不能出现特殊字符"
+        }
+      ],
+      avatarRules: [{ validate: val => !!val, message: "请选择头像" }],
+      validateForm: {
+        tel: "18111111111",
+        qq: "999584621"
+      },
+      newTeamForm: {
+        teamname: "",
+        avatar:""
+      }
     };
   },
   computed: {
@@ -181,8 +261,59 @@ export default {
     vreset() {
       this.vactiveStep = 0;
     },
-    createTeam() {},
-    joinTeam() {}
+    submit() {
+      this.$refs.form.validate().then(result => {
+        console.log("form valid: ", result);
+        if (result) {
+          this.$axios
+            .post(this.url + "register", this.validateForm)
+            .then(res => {
+              console.log(res);
+              if (res.data.isOk) {
+                this.openRegister = false;
+                this.vhandleNext();
+                this.show_toast("报名成功！", 0);
+                this.userInfo = res.data.userInfo;
+              } else {
+                this.show_toast("报名失败……", 1);
+              }
+            })
+            .catch(res => {
+              console.log(res);
+              this.show_toast("服务器连接失败，请稍后重试。", 1);
+            });
+        }
+      });
+    },
+
+    submitCreate() {
+      this.$refs.form.validate().then(result => {
+        if (result) {
+          this.show_toast("队伍创建成功！", 0);
+          console.log(this.newTeamForm)
+        }
+      });
+    },
+    regsiter() {
+      this.openRegister = true;
+    },
+    createTeam() {
+      this.openNewTeam = true;
+    },
+    joinTeam() {
+      this.show_toast("加入队伍成功！", 0);
+    },
+    shareTeam() {
+      //可能会展示二维码
+    },
+    show_toast(string, type) {
+      // console.log(string)
+      if (type == 1) {
+        this.$toast.error(string);
+      } else {
+        this.$toast.success(string);
+      }
+    }
   },
   mounted() {
     const that = this;
@@ -193,6 +324,23 @@ export default {
         that.isPc = that.fullWidth > 1000;
       })();
     };
+    //请求刷新组队数据
+    this.$axios
+      .post(this.url + "getteam")
+      .then(res => {
+        console.log(res);
+        if (res.data.isOk) {
+          console.log("获取信息成功");
+          this.userInfo = res.data.userInfo;
+        } else {
+          console.log("获取信息失败，请检查是否有授权信息");
+          this.show_toast(res.data.errmsg, 1);
+        }
+      })
+      .catch(res => {
+        console.log(res);
+        this.show_toast("服务器连接失败！", 1);
+      });
   }
 };
 </script>
@@ -225,6 +373,19 @@ export default {
 .avatar-member {
   padding-left: 3rem;
   padding-right: 0.5rem;
+}
+.mu-demo-form {
+  padding-bottom: 0;
+}
+.lastone {
+  margin-bottom: 0;
+}
+/* .mu-dialog-body{
+    padding-bottom: 0;
+} */
+.mu-dialog-actions {
+  padding-bottom: 15px;
+  padding-right: 15px;
 }
 
 @media screen and (min-width: 500px) {

@@ -6,12 +6,14 @@
           <mu-card-title title="请登陆" sub-title="" class="unpadding-bottom"></mu-card-title>
           <mu-card-text class="unpadding-top">
             <mu-form ref="form" :model="validateForm" class="mu-demo-form">
+
               <mu-form-item label-color="green" label-float label="学号" help-text="使用一卡通账号和密码登陆" prop="username" :rules="usernameRules">
                 <mu-text-field v-model="validateForm.username" prop="username"></mu-text-field>
               </mu-form-item>
               <mu-form-item label-float label="密码" prop="password" :rules="passwordRules">
                 <mu-text-field type="password" v-model="validateForm.password" prop="password"></mu-text-field>
               </mu-form-item>
+              
               <mu-form-item prop="isAgree" :rules="argeeRules">
                 <mu-checkbox label="同意比赛守则" v-model="validateForm.isAgree"></mu-checkbox>
               </mu-form-item>
@@ -49,18 +51,6 @@
 }
 </style>
 <script>
-import axios from "axios";
-axios.defaults.withCredentials = true;
-axios.interceptors.request.use(config => {
-  console.log(document.cookie);
-  config.headers["X-Requested-With"] = "XMLHttpRequest";
-  let regex = /.*csrftoken=([^;.]*).*$/;
-  config.headers["X-CSRFToken"] =
-    document.cookie.match(regex) === null
-      ? null
-      : document.cookie.match(regex)[1];
-  return config;
-});
 export default {
   data() {
     return {
@@ -106,16 +96,16 @@ export default {
         console.log("form valid: ", result);
         if (result) {
           console.log(this.validateForm);
-          axios
+          this.$axios
             .post(this.url + "login", this.validateForm)
             .then(res => {
               console.log(res);
               if (res.data.isOk) {
-                console.log("ok");
+                console.log("登陆成功");
                 this.show_toast("登陆成功", 0);
                 this.$router.push("myTeam");
               } else {
-                console.log("not ok");
+                console.log("登陆错误");
                 this.show_toast(res.data.errmsg, 1);
               }
             })

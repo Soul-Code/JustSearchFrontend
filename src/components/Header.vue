@@ -45,14 +45,17 @@
     </mu-appbar>
     <mu-drawer :open.sync="open" :docked="docked" :right="position === 'right'">
       <mu-list>
-        <mu-list-item button>
-          <mu-list-item-title>Menu Item 1</mu-list-item-title>
+        <mu-list-item button @click="open = false" to="/justsoso/Answer">
+          <mu-list-item-title>答题</mu-list-item-title>
         </mu-list-item>
-        <mu-list-item button>
-          <mu-list-item-title>Menu Item 2</mu-list-item-title>
+        <mu-list-item button @click="open = false" to="/justsoso/Rank">
+          <mu-list-item-title>排名</mu-list-item-title>
         </mu-list-item>
-        <mu-list-item @click="open = false" button>
-          <mu-list-item-title>Close</mu-list-item-title>
+        <mu-list-item button @click="open = false" to="/justsoso/myTeam">
+          <mu-list-item-title>我的队伍</mu-list-item-title>
+        </mu-list-item>
+        <mu-list-item button @click="open = false" to="/justsoso/Login">
+          <mu-list-item-title>登陆</mu-list-item-title>
         </mu-list-item>
       </mu-list>
     </mu-drawer>

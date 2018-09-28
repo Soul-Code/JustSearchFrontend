@@ -5,6 +5,7 @@ import Answer from "./components/Answer.vue";
 import Rank from "./components/Rank.vue";
 
 export const routes = [
+  { path: "/", component: Home, name: -1 },
   { path: "/justsoso", component: Home, name: -1 },
   { path: "/justsoso/login", component: Login, name: 3 },
   { path: "/justsoso/myteam", component: myTeam, name: 2 },
