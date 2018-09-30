@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "lodash": "^4.17.11",
     "muse-ui": "^3.0.1",
     "muse-ui-toast": "^0.3.0",
     "npm": "^6.4.1",

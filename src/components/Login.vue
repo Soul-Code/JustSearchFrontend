@@ -13,7 +13,7 @@
               <mu-form-item label-float label="密码" prop="password" :rules="passwordRules">
                 <mu-text-field type="password" v-model="validateForm.password" prop="password"></mu-text-field>
               </mu-form-item>
-              
+
               <mu-form-item prop="isAgree" :rules="argeeRules">
                 <mu-checkbox label="同意比赛守则" v-model="validateForm.isAgree"></mu-checkbox>
               </mu-form-item>
@@ -74,14 +74,18 @@ export default {
       ],
       argeeRules: [{ validate: val => !!val, message: "必须同意比赛守则" }],
       validateForm: {
-        username: "16122364",
-        password: "123456",
+        username: "",
+        password: "",
         isAgree: true
       }
     };
   },
   mounted() {
     const that = this;
+    console.log(localStorage.getItem('isLogin'))
+    if(localStorage.getItem('isLogin')){
+      this.$router.push('myTeam')
+    }
     window.onresize = () => {
       return (() => {
         window.fullHeight = document.documentElement.clientHeight;
@@ -103,6 +107,8 @@ export default {
               if (res.data.isOk) {
                 console.log("登陆成功");
                 this.show_toast("登陆成功", 0);
+                localStorage.setItem("isLogin", 1);
+                localStorage.setItem("userid", this.validateForm.username);
                 this.$router.push("myTeam");
               } else {
                 console.log("登陆错误");

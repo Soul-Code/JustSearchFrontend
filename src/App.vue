@@ -10,9 +10,10 @@
 <script>
 import Header from "./components/header.vue";
 var url = "";
-const debug = true;
+const debug = false;
 if (debug) url = "http://soulcode.cn:8080/justsoso/api/";
 else url = "https://soulcode.cn/justsoso/api/";
+
 export default {
   url,
   components: {

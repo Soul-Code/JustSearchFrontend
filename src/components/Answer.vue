@@ -1,8 +1,12 @@
 <template>
     <mu-container class="answer-main">
+        <mu-dialog title="Dialog" width="360" :open.sync="openDialog">
+            比赛时间未到~
+            <mu-button slot="actions" flat color="primary" @click="go_out">Close</mu-button>
+        </mu-dialog>
         <mu-expansion-panel>
             <div slot="header">1.我我是题目的内容我是题目的内容我是题目的内容我是题目的内容</div>
-            
+
             <mu-button slot="action" flat>Cancel</mu-button>
             <mu-button slot="action" flat color="primary">Save</mu-button>
         </mu-expansion-panel>
@@ -24,3 +28,21 @@
   margin-top: 30px;
 }
 </style>
+<script>
+export default {
+  data() {
+    return {
+      openDialog: true,
+      current: 3
+    };
+  },
+  created() {
+  },
+  mounted() {},
+  methods: {
+    go_out() {
+      this.$router.push("myTeam");
+    }
+  }
+};
+</script>

@@ -7,10 +7,10 @@
       <router-link to="/justsoso" slot="left" class="title">
         Just搜搜 | 网络答题系统
       </router-link>
-      <mu-button v-if="!isLogin" to="/justsoso/Login" flat class="btn" slot="right">
+      <!-- <mu-button v-if="isLogin" to="/justsoso/Login" flat class="btn" slot="right">
         登陆
-      </mu-button>
-      <mu-button v-if="isLogin" @click="logout" flat class="btn" slot="right">
+      </mu-button> -->
+      <mu-button v-if="!isLogin" @click="logout" flat class="btn" slot="right">
         退出登陆
       </mu-button>
     </mu-appbar>
@@ -24,21 +24,21 @@
           <router-link to="/justsoso" slot="left" class="title">
             Just搜搜 | 网络答题系统 PC端
           </router-link>
-          <mu-tabs :value.sync="active" color='grey800' indicator-color='primary'>
+          <mu-tabs :value.sync="active" color='grey800' indicator-color='primary' full-width>
             <mu-tab to="/justsoso/Answer" class="tabs">答题</mu-tab>
             <mu-tab to="/justsoso/Rank" class="tabs">排名</mu-tab>
             <mu-tab to="/justsoso/myTeam" class="tabs">我的队伍</mu-tab>
             <mu-tab to="/justsoso/Login" class="tabs">登陆</mu-tab>
           </mu-tabs>
-          <mu-button round class="btn" color='primary' slot="right">
+          <!-- <mu-button round class="btn" color='primary' slot="right">
             上传答案
-          </mu-button>
+          </mu-button> -->
           <mu-button v-if="isLogin" @click="logout" round class="btn" color="grey600" slot="right">
             退出登陆
           </mu-button>
-          <mu-button v-if="!isLogin" to="/justsoso/Login" round class="btn" color="grey600" slot="right">
+          <!-- <mu-button v-else to="/justsoso/Login" round class="btn" color="grey600" slot="right">
             登陆
-          </mu-button>
+          </mu-button> -->
 
         </mu-appbar>
       </mu-container>
@@ -70,15 +70,21 @@ export default {
       open: false,
       position: "left",
 
-      isLogin,
+      isLogin: false,
       active: 0,
       fullWidth: document.documentElement.clientWidth,
       isPc: document.documentElement.clientWidth > 1000
     };
   },
+  watch:{
+    active(){
+      this.isLogin = localStorage.getItem("isLogin");
+    }
+  },
   mounted() {
     const that = this;
     this.active = this.$route.name;
+    this.isLogin = localStorage.getItem("isLogin");
     window.onresize = () => {
       return (() => {
         window.fullHeight = document.documentElement.clientHeight;
@@ -87,9 +93,34 @@ export default {
       })();
     };
   },
+  computed: {},
   methods: {
     logout() {
-      this.$toast.success("退出登陆成功！");
+      this.$axios
+        .get(this.url + "logout")
+        .then(res => {
+          if (res.data.isOk) {
+            localStorage.setItem("isLogin", "");
+            this.isLogin = localStorage.getItem("isLogin");
+            this.$toast.success("退出登陆成功！");
+            this.$router.push("Login");
+          } else {
+            console.log("登出错误");
+            this.show_toast(res.data.errmsg, 1);
+          }
+        })
+        .catch(res => {
+          console.log(res);
+          this.show_toast("服务器连接失败！", 1);
+        });
+    },
+    show_toast(string, type) {
+      // console.log(string)
+      if (type == 1) {
+        this.$toast.error(string);
+      } else {
+        this.$toast.success(string);
+      }
     }
   }
 };
