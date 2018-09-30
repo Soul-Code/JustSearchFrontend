@@ -487,7 +487,7 @@
             if (res.data.isOk) {
               this.show_toast("解散队伍成功！", 0);
               this.userInfo = res.data.userInfo;
-              openDel = false;
+              this.openDel = false;
               this.loading2 = false;
             } else {
               this.show_toast("解散队伍失败……", 1);
