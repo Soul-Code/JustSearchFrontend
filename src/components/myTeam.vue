@@ -31,6 +31,14 @@
                       <mu-icon value="reply"></mu-icon>
                     </mu-button>
                   </mu-tooltip>
+
+                  <mu-tooltip v-else placement="top" content="解散队伍">
+                    <mu-button icon color="red" @click="delTeam">
+                      <mu-icon value="delete"></mu-icon>
+                    </mu-button>
+                  </mu-tooltip>
+                    
+
                 </mu-list-item-action>
               </mu-list-item>
 
@@ -287,8 +295,8 @@ export default {
         }
       ],
       validateForm: {
-        tel: "18111111111",
-        qq: "999584621"
+        tel: "",
+        qq: ""
       },
       newTeamForm: {
         teamname: ""
@@ -358,7 +366,7 @@ export default {
               console.log(res);
               if (res.data.isOk) {
                 this.openNewTeam = false;
-                this.vhandleNext();
+                // this.vhandleNext();
                 this.show_toast("队伍创建成功！", 0);
                 this.userInfo = res.data.userInfo;
               } else {
@@ -438,6 +446,23 @@ export default {
           this.show_toast("服务器连接失败，请稍后重试。", 1);
         });
     },
+    delTeam() {
+      this.$axios
+        .post(this.url + "del_team")
+        .then(res => {
+          console.log(res);
+          if (res.data.isOk) {
+            this.show_toast("解散队伍成功！", 0);
+            this.userInfo = res.data.userInfo;
+          } else {
+            this.show_toast("解散队伍失败……", 1);
+          }
+        })
+        .catch(res => {
+          console.log(res);
+          this.show_toast("服务器连接失败，请稍后重试。", 1);
+        });
+    },
     show_toast(string, type) {
       // console.log(string)
       if (type == 1) {
@@ -450,21 +475,20 @@ export default {
       let qrcode = new QRCode("qrcode", {
         width: 200,
         height: 200, // 高度
-        text: this.url, // 二维码内容
+        text: this.url // 二维码内容
         // render: 'canvas'
         // 设置渲染方式（有两种方式 table和canvas，默认是canvas）
         // background: '#eeeeee',
         // foreground: '#FF00FF'
-        
       });
       console.log(qrcode);
     }
   },
   mounted() {
     const that = this;
-    if(!localStorage.getItem('isLogin')){
-      console.log('jumpToLogin')
-      this.$router.push('Login')
+    if (!localStorage.getItem("isLogin")) {
+      console.log("jumpToLogin");
+      this.$router.push("Login");
     }
     window.onresize = () => {
       return (() => {
@@ -484,14 +508,16 @@ export default {
           //刷新step
           if (!this.userInfo.tel) {
             this.vactiveStep = 0;
-          } else if (this.userInfo.team.mems.length >= 3) {
-            this.vactiveStep = 2;
+          } else if (this.userInfo.team.mems) {
+            if (this.userInfo.team.mems.length >= 3) this.vactiveStep = 2;
           } else {
             this.vactiveStep = 1;
           }
         } else {
           console.log("获取信息失败，请检查是否有授权信息");
           this.show_toast(res.data.errmsg, 1);
+          localStorage.setItem("isLogin", "");
+          this.$router.push('Login')
         }
       })
       .catch(res => {

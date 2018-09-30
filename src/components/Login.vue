@@ -18,7 +18,7 @@
                 <mu-checkbox label="同意比赛守则" v-model="validateForm.isAgree"></mu-checkbox>
               </mu-form-item>
               <mu-form-item class="last-one">
-                <mu-button color="success" @click="submit">提交</mu-button>
+                <mu-button color="success" @click="submit">登陆</mu-button>
                 <mu-button @click="clear">重置</mu-button>
               </mu-form-item>
             </mu-form>

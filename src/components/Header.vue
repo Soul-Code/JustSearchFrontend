@@ -7,10 +7,10 @@
       <router-link to="/justsoso" slot="left" class="title">
         Just搜搜 | 网络答题系统
       </router-link>
-      <!-- <mu-button v-if="isLogin" to="/justsoso/Login" flat class="btn" slot="right">
+      <mu-button v-if="!isLogin" to="/justsoso/Login" flat class="btn" slot="right">
         登陆
-      </mu-button> -->
-      <mu-button v-if="!isLogin" @click="logout" flat class="btn" slot="right">
+      </mu-button>
+      <mu-button v-else @click="logout" flat class="btn" slot="right">
         退出登陆
       </mu-button>
     </mu-appbar>
@@ -54,9 +54,12 @@
         <mu-list-item button @click="open = false" to="/justsoso/myTeam">
           <mu-list-item-title>我的队伍</mu-list-item-title>
         </mu-list-item>
-        <mu-list-item button @click="open = false" to="/justsoso/Login">
+        <!-- <mu-list-item v-if="!isLogin" button @click="open = false" to="/justsoso/Login">
           <mu-list-item-title>登陆</mu-list-item-title>
         </mu-list-item>
+        <mu-list-item v-else button @click="open = false;logout" >
+          <mu-list-item-title >退出登陆</mu-list-item-title>
+        </mu-list-item> -->
       </mu-list>
     </mu-drawer>
   </div>
@@ -76,8 +79,8 @@ export default {
       isPc: document.documentElement.clientWidth > 1000
     };
   },
-  watch:{
-    active(){
+  watch: {
+    active() {
       this.isLogin = localStorage.getItem("isLogin");
     }
   },
