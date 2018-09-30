@@ -4,6 +4,8 @@ import MuseUI from "muse-ui";
 import "muse-ui/dist/muse-ui.css";
 
 import Toast from "muse-ui-toast";
+import 'muse-ui-loading/dist/muse-ui-loading.css'
+import Loading from 'muse-ui-loading';
 //使用Vue原生路由
 import VueRouter from "vue-router";
 import { routes } from "./routes.js";
@@ -30,7 +32,10 @@ Vue.prototype.$axios = axios;
 
 Vue.use(MuseUI);
 Vue.use(VueRouter);
+
 Vue.use(Toast);
+Vue.use(Loading);
+
 Vue.prototype.url = App.url;
 
 //主题设置
