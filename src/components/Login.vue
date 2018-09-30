@@ -18,7 +18,7 @@
                 <mu-checkbox label="同意比赛守则" v-model="validateForm.isAgree"></mu-checkbox>
               </mu-form-item>
               <mu-form-item class="last-one">
-                <mu-button color="success" @click="submit">登陆</mu-button>
+                <mu-button color="success" v-loading="loading1" data-mu-loading-size="24"  @click="submit">登陆</mu-button>
                 <mu-button @click="clear">重置</mu-button>
               </mu-form-item>
             </mu-form>
@@ -58,6 +58,9 @@ export default {
       name: "",
       url: this.url,
       fullHeight: window.innerHeight,
+
+      loading1:false,
+
       usernameRules: [
         { validate: val => !!val, message: "必须填写学号" },
         {
@@ -96,6 +99,7 @@ export default {
   methods: {
     submit() {
       // let that = this;
+      this.loading1 = true;
       this.$refs.form.validate().then(result => {
         console.log("form valid: ", result);
         if (result) {
@@ -113,11 +117,13 @@ export default {
               } else {
                 console.log("登陆错误");
                 this.show_toast(res.data.errmsg, 1);
+                 this.loading1 = false;
               }
             })
             .catch(res => {
               console.log(res);
               this.show_toast("服务器连接失败！", 1);
+              this.loading1 = false;
             });
         }
       });
