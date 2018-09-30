@@ -12,6 +12,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "lodash": "^4.17.11",
+    "material-icons": "^0.2.3",
     "muse-ui": "^3.0.1",
     "muse-ui-loading": "^0.2.0",
     "muse-ui-toast": "^0.3.0",

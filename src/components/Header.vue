@@ -66,6 +66,9 @@
 </template>
 <script>
 export default {
+  props: {
+    isLogined: Boolean
+  },
   data() {
     return {
       //Drawer
@@ -82,6 +85,10 @@ export default {
   watch: {
     active() {
       this.isLogin = localStorage.getItem("isLogin");
+    },
+    isLogined() {
+      console.log("登陆了");
+      this.isLogin = localStorage.getItem("isLogin");
     }
   },
   mounted() {
@@ -96,7 +103,8 @@ export default {
       })();
     };
   },
-  computed: {},
+  computed: {
+  },
   methods: {
     logout() {
       this.$axios
