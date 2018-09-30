@@ -33,11 +33,16 @@
                   </mu-tooltip>
 
                   <mu-tooltip v-else placement="top" content="解散队伍">
-                    <mu-button icon color="red" @click="delTeam">
+                    <mu-button icon color="red" @click="openDel=true">
                       <mu-icon value="delete"></mu-icon>
                     </mu-button>
                   </mu-tooltip>
-                    
+
+                  <mu-dialog title="解散队伍" width="400px" max-width="80%" :esc-press-close="false" :overlay-close="false" :open.sync="openDel">
+                    确认解散队伍？你的队员将无家（队）可归！
+                    <mu-button slot="actions" @click="openDel = false">我再想想</mu-button>
+                    <mu-button slot="actions" color="red" @click="delTeam">我意已决 </mu-button>
+                  </mu-dialog>
 
                 </mu-list-item-action>
               </mu-list-item>
@@ -89,7 +94,7 @@
                     <span v-if="!userInfo.tel">点我报名</span>
                     <span v-else>修改信息</span>
                   </mu-button>
-                  <mu-button flat class="demo-step-button" @click="vhandleNext">下一步</mu-button>
+                  <mu-button v-if="userInfo.team.id" flat class="demo-step-button" @click="vhandleNext">下一步</mu-button>
 
                   <mu-dialog :title="userInfo.tel?'修改信息':'请完善信息进行报名'" width="400px" max-width="80%" :esc-press-close="false" :overlay-close="false" :open.sync="openRegister">
 
@@ -251,6 +256,7 @@ export default {
       openNewTeam: false,
       openJoinTeam: false,
       openShare: false,
+      openDel: false,
       teamFound: {},
 
       telRules: [
@@ -454,6 +460,7 @@ export default {
           if (res.data.isOk) {
             this.show_toast("解散队伍成功！", 0);
             this.userInfo = res.data.userInfo;
+            openDel = false;
           } else {
             this.show_toast("解散队伍失败……", 1);
           }
@@ -517,7 +524,7 @@ export default {
           console.log("获取信息失败，请检查是否有授权信息");
           this.show_toast(res.data.errmsg, 1);
           localStorage.setItem("isLogin", "");
-          this.$router.push('Login')
+          this.$router.push("Login");
         }
       })
       .catch(res => {
