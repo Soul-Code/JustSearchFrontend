@@ -3,6 +3,7 @@
     <mu-card raised class="card-main">
       <mu-flex wrap="wrap" v-bind:justify-content="isPc?'between':'center'">
         <mu-flex fill>
+          <!-- 个人信息卡 -->
           <mu-card v-loading="loading1" class="card-info" style="">
             <mu-card-title class="title-name" :title="userInfo.name">
             </mu-card-title>
@@ -26,7 +27,7 @@
                     积分：{{userInfo.team.score}}分</mu-list-item-sub-title>
                 </mu-list-item-content>
 
-                <mu-list-item-action>
+                <mu-list-item-action v-if="userInfo.team.score==0">
                   <mu-tooltip v-if="userInfo.team.leader != userInfo.name" placement="top" content="退出队伍">
                     <mu-button icon color="blue" @click="quitTeam(userInfo.id)">
                       <mu-icon value="reply"></mu-icon>
@@ -67,7 +68,7 @@
                 <mu-list-item-content>
                   <mu-list-item-title>{{mem.name}}</mu-list-item-title>
                 </mu-list-item-content>
-                <mu-list-item-action v-if="userInfo.team.leader == userInfo.name && mem.name !=userInfo.name">
+                <mu-list-item-action v-if="userInfo.team.leader == userInfo.name && mem.name !=userInfo.name && userInfo.team.score==0">
                   <mu-tooltip placement="top" content="踢出队员">
                     <mu-button @click="quitTeam(mem.id)" icon color="error">
                       <mu-icon value="close"></mu-icon>
@@ -82,7 +83,7 @@
         <mu-flex fill>
           <div class="demo-vsteper-container">
             <mu-stepper :active-step="vactiveStep" orientation="vertical">
-
+              <!-- step1 报名 -->
               <mu-step>
                 <mu-step-label>
                   报名比赛
@@ -92,7 +93,12 @@
                     <span v-if="!userInfo.tel">登陆成功，现在点击下面的按钮输入信息来报名~</span>
                     <span v-else>报名成功，您现在可以点击下面的按钮修改信息~</span>
                   </p>
-                  <mu-button class="demo-step-button" @click="openRegister = true" color="primary">
+                  <mu-button 
+                  class="demo-step-button" 
+                  @click="openRegister = true;
+                          validateForm.tel=userInfo.tel;
+                          validateForm.qq=userInfo.qq" 
+                  color="primary">
                     <span v-if="!userInfo.tel">点我报名</span>
                     <span v-else>修改信息</span>
                   </mu-button>
@@ -116,6 +122,7 @@
 
                 </mu-step-content>
               </mu-step>
+              <!-- step2 组队 -->
               <mu-step v-if="!userInfo.team.id">
                 <mu-step-label>
                   加入/创建队伍
@@ -125,34 +132,35 @@
                     参加比赛的小可爱们，恭喜你们报名成功啦。现在的你们可以选择<strong>创建</strong>属于自己的队伍（你将成为队长），或者选择<strong>加入</strong>别人的队伍~<br>
                     Ps.每个队伍为3人哟~
                   </p>
-                  <mu-button class="demo-step-button" @click="openJoinTeam = true" color="primary">加入队伍</mu-button>
-                  <mu-button class="demo-step-button" @click="openNewTeam = true;" color="primary">创建队伍</mu-button>
+                    <mu-button class="demo-step-button" @click="openJoinTeam = true" color="primary">加入队伍</mu-button>
+                    <mu-button class="demo-step-button" @click="openNewTeam = true;" color="primary">创建队伍</mu-button>
 
-                  <mu-dialog title="创建新的队伍" width="400px" max-width="80%" :esc-press-close="false" :overlay-close="false" :open.sync="openNewTeam">
-                    <mu-form ref="form" :model="newTeamForm" class="mu-demo-form">
-                      <mu-form-item label-float label="队伍名称" help-text="创建队伍你将成为队长！" prop="teamname" :rules="teamnameRules">
-                        <mu-text-field type="text" v-model="newTeamForm.teamname" prop="teamname"></mu-text-field>
-                      </mu-form-item>
-                    </mu-form>
-                    <mu-button slot="actions" @click="openNewTeam = false">返回</mu-button>
-                    <mu-button slot="actions" color="success" @click="submitCreate">确认创建</mu-button>
-                  </mu-dialog>
+                    <mu-dialog title="创建新的队伍" width="400px" max-width="80%" :esc-press-close="false" :overlay-close="false" :open.sync="openNewTeam">
+                      <mu-form ref="form" :model="newTeamForm" class="mu-demo-form">
+                        <mu-form-item label-float label="队伍名称" help-text="创建队伍你将成为队长！" prop="teamname" :rules="teamnameRules">
+                          <mu-text-field type="text" v-model="newTeamForm.teamname" prop="teamname"></mu-text-field>
+                        </mu-form-item>
+                      </mu-form>
+                      <mu-button slot="actions" @click="openNewTeam = false">返回</mu-button>
+                      <mu-button slot="actions" color="success" @click="submitCreate">确认创建</mu-button>
+                    </mu-dialog>
 
-                  <mu-dialog title="加入队伍" width="400px" max-width="80%" :esc-press-close="false" :overlay-close="false" :open.sync="openJoinTeam">
-                    <mu-form ref="form" :model="teamFindForm" class="mu-demo-form">
-                      <mu-form-item label-float label="队伍id/名称/队长" help-text="优先匹配id" prop="teamfind" :rules="teamfindRules">
-                        <mu-text-field type="text" v-model="teamFindForm.teamfind" prop="teamfind"></mu-text-field>
-                      </mu-form-item>
-                    </mu-form>
-                    <span v-if="teamFound.name" style="color:#000;padding-right:10px"> <strong>{{teamFound.name}}</strong>
-                    </span> <span v-if="teamFound.id"> id:{{teamFound.id}} 队长：{{teamFound.leader}}</span>
-                    <mu-button slot="actions" @click="openJoinTeam = false">返回</mu-button>
-                    <mu-button slot="actions" color="success" @click="submitJoin" :disabled="!teamFound.id">加入队伍</mu-button>
-                  </mu-dialog>
+                    <mu-dialog title="加入队伍" width="400px" max-width="80%" :esc-press-close="false" :overlay-close="false" :open.sync="openJoinTeam">
+                      <mu-form ref="form" :model="teamFindForm" class="mu-demo-form">
+                        <mu-form-item label-float label="队伍id/名称/队长" help-text="优先匹配id" prop="teamfind" :rules="teamfindRules">
+                          <mu-text-field type="text" v-model="teamFindForm.teamfind" prop="teamfind"></mu-text-field>
+                        </mu-form-item>
+                      <span v-if="teamFound.name" style="color:#000;padding-right:10px"> <strong>{{teamFound.name}}</strong>
+                      </span> <span v-if="teamFound.id"> id:{{teamFound.id}} 队长：{{teamFound.leader}}</span>
+                      </mu-form>
+                      <mu-button slot="actions" @click="openJoinTeam = false">返回</mu-button>
+                      <mu-button slot="actions" color="success" @click="submitJoin" :disabled="!teamFound.id">加入队伍</mu-button>
+                    </mu-dialog>
 
-                  <mu-button flat class="demo-step-button" @click="vhandlePrev">上一步</mu-button>
+                    <mu-button flat class="demo-step-button" @click="vhandlePrev">上一步</mu-button>
                 </mu-step-content>
               </mu-step>
+              <!-- step2 分享队伍 -->
               <mu-step v-if="userInfo.team.id && userInfo.team.mems.length<=3">
                 <mu-step-label>
                   分享队伍
@@ -182,7 +190,7 @@
                   <mu-button flat class="demo-step-button" @click="vhandlePrev">上一步</mu-button>
                 </mu-step-content>
               </mu-step>
-
+              <!-- step3 准备参赛 -->
               <mu-step>
                 <mu-step-label>
                   准备参赛
@@ -233,10 +241,6 @@
                 </mu-step-content>
               </mu-step>
             </mu-stepper>
-            <p v-if="vfinished">
-              都完成啦!
-              <a href="javascript:;" @click="vreset">点这里</a>可以重置
-            </p>
           </div>
         </mu-flex>
       </mu-flex>
@@ -244,7 +248,7 @@
   </mu-flex>
 </template>
 <script>
-import QRCode from "qrcodejs2";
+// import QRCode from "qrcodejs2";
 let lodash = require("lodash");
 export default {
   data() {
@@ -359,6 +363,7 @@ export default {
       this.vactiveStep = 0;
     },
     submitEnroll() {
+      //报名比赛
       this.$refs.form.validate().then(result => {
         // console.log("form valid: ", result);
         if (result) {
@@ -373,9 +378,9 @@ export default {
                 this.show_toast("报名成功！", 0);
                 this.userInfo = res.data.userInfo;
                 this.loading4 = false;
-                refreshStep()
+                refreshStep();
               } else {
-                this.show_toast("报名失败……", 1);
+                this.show_toast(res.data.errmsg, 1);
                 this.loading4 = false;
               }
             })
@@ -388,6 +393,7 @@ export default {
       });
     },
     submitCreate() {
+      //创建队伍
       this.$refs.form.validate().then(result => {
         if (result) {
           this.$axios
@@ -400,9 +406,9 @@ export default {
                 this.show_toast("队伍创建成功！", 0);
                 this.userInfo = res.data.userInfo;
               } else {
-                this.show_toast("队伍创建失败……", 1);
+                this.show_toast(res.data.errmsg, 1);
               }
-              this.refreshStep()
+              this.refreshStep();
             })
             .catch(res => {
               // console.log(res);
@@ -414,6 +420,7 @@ export default {
       });
     },
     submitJoin() {
+      //加入队伍
       this.$axios
         .post(this.url + "join_team", this.teamFound)
         .then(res => {
@@ -426,7 +433,7 @@ export default {
           } else {
             this.show_toast(res.data.errmsg, 1);
           }
-          this.refreshStep()
+          this.refreshStep();
         })
         .catch(res => {
           console.log(res);
@@ -468,17 +475,17 @@ export default {
               this.show_toast("退出队伍成功！", 0);
               this.userInfo = res.data.userInfo;
             } else {
-              this.show_toast("退出队伍失败……", 1);
+              this.show_toast(res.data.errmsg, 1);
             }
           } else {
             if (res.data.isOk) {
               this.show_toast("删除队员成功！", 0);
               this.userInfo = res.data.userInfo;
             } else {
-              this.show_toast("删除队员失败……", 1);
+              this.show_toast(res.data.errmsg, 1);
             }
           }
-            this.refreshStep()
+          this.refreshStep();
         })
         .catch(res => {
           console.log(res);
@@ -496,10 +503,10 @@ export default {
             this.userInfo = res.data.userInfo;
             this.openDel = false;
           } else {
-            this.show_toast("解散队伍失败……", 1);
+            this.show_toast(res.data.errmsg, 1);
           }
           this.loading2 = false;
-          this.refreshStep()
+          this.refreshStep();
         })
         .catch(res => {
           console.log(res);
