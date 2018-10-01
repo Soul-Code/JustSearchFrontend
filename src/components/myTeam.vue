@@ -82,6 +82,7 @@
         <mu-flex fill>
           <div class="demo-vsteper-container">
             <mu-stepper :active-step="vactiveStep" orientation="vertical">
+
               <mu-step>
                 <mu-step-label>
                   报名比赛
@@ -98,7 +99,6 @@
                   <mu-button v-if="userInfo.tel" flat class="demo-step-button" @click="vhandleNext">下一步</mu-button>
 
                   <mu-dialog :title="userInfo.tel?'修改信息':'请完善信息进行报名'" width="400px" max-width="80%" :esc-press-close="false" :overlay-close="false" :open.sync="openRegister">
-
                     <mu-form ref="form" :model="validateForm" class="mu-demo-form">
                       <mu-form-item label-float label="手机号" help-text="请保证手机号码通信畅通！" prop="tel" :rules="telRules">
                         <mu-text-field type="number" v-model="validateForm.tel" prop="tel"></mu-text-field>
@@ -107,7 +107,6 @@
                         <mu-text-field type="number" v-model="validateForm.qq" prop="qq"></mu-text-field>
                       </mu-form-item>
                     </mu-form>
-
                     <mu-button slot="actions" @click="openRegister = false">返回</mu-button>
                     <mu-button v-loading="loading4" data-mu-loading-size="24" slot="actions" color="success" @click="submitEnroll">
                       <span v-if="!userInfo.tel">确认报名</span>
@@ -123,7 +122,8 @@
                 </mu-step-label>
                 <mu-step-content>
                   <p>
-                    参加比赛的小可爱们，恭喜你们报名成功啦。现在的你们可以选择<strong>创建</strong>属于自己的队伍（你将成为队长），或者选择<strong>加入</strong>别人的队伍~
+                    参加比赛的小可爱们，恭喜你们报名成功啦。现在的你们可以选择<strong>创建</strong>属于自己的队伍（你将成为队长），或者选择<strong>加入</strong>别人的队伍~<br>
+                    Ps.每个队伍为3人哟~
                   </p>
                   <mu-button class="demo-step-button" @click="openJoinTeam = true" color="primary">加入队伍</mu-button>
                   <mu-button class="demo-step-button" @click="openNewTeam = true;" color="primary">创建队伍</mu-button>
@@ -153,7 +153,7 @@
                   <mu-button flat class="demo-step-button" @click="vhandlePrev">上一步</mu-button>
                 </mu-step-content>
               </mu-step>
-              <mu-step v-if="userInfo.team.id && userInfo.team.mems.length<3">
+              <mu-step v-if="userInfo.team.id && userInfo.team.mems.length<=3">
                 <mu-step-label>
                   分享队伍
                 </mu-step-label>
@@ -183,7 +183,7 @@
                 </mu-step-content>
               </mu-step>
 
-              <mu-step v-if="userInfo.team.id && userInfo.team.mems.length<3">
+              <mu-step>
                 <mu-step-label>
                   准备参赛
                 </mu-step-label>
@@ -373,6 +373,7 @@ export default {
                 this.show_toast("报名成功！", 0);
                 this.userInfo = res.data.userInfo;
                 this.loading4 = false;
+                refreshStep()
               } else {
                 this.show_toast("报名失败……", 1);
                 this.loading4 = false;
@@ -401,6 +402,7 @@ export default {
               } else {
                 this.show_toast("队伍创建失败……", 1);
               }
+              this.refreshStep()
             })
             .catch(res => {
               // console.log(res);
@@ -422,8 +424,9 @@ export default {
             this.show_toast("加入队伍成功！", 0);
             this.userInfo = res.data.userInfo;
           } else {
-            this.show_toast("加入队伍失败……", 1);
+            this.show_toast(res.data.errmsg, 1);
           }
+          this.refreshStep()
         })
         .catch(res => {
           console.log(res);
@@ -475,6 +478,7 @@ export default {
               this.show_toast("删除队员失败……", 1);
             }
           }
+            this.refreshStep()
         })
         .catch(res => {
           console.log(res);
@@ -495,6 +499,7 @@ export default {
             this.show_toast("解散队伍失败……", 1);
           }
           this.loading2 = false;
+          this.refreshStep()
         })
         .catch(res => {
           console.log(res);
@@ -502,6 +507,7 @@ export default {
           this.loading2 = false;
         });
     },
+
     show_toast(string, type) {
       // console.log(string)
       if (type == 1) {
@@ -521,6 +527,15 @@ export default {
         // foreground: '#FF00FF'
       });
       console.log(qrcode);
+    },
+    refreshStep() {
+      if (!this.userInfo.tel) {
+        this.vactiveStep = 0;
+      } else if (this.userInfo.team.mems) {
+        if (this.userInfo.team.mems.length == 3) this.vactiveStep = 2;
+      } else {
+        this.vactiveStep = 1;
+      }
     }
   },
   mounted() {
@@ -550,7 +565,7 @@ export default {
           if (!this.userInfo.tel) {
             this.vactiveStep = 0;
           } else if (this.userInfo.team.mems) {
-            if (this.userInfo.team.mems.length >= 3) this.vactiveStep = 2;
+            if (this.userInfo.team.mems.length == 3) this.vactiveStep = 2;
           } else {
             this.vactiveStep = 1;
           }
