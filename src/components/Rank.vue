@@ -64,7 +64,6 @@ export default {
       teams: [],
       users: [],
       items: [1, 2, 3, 4, 5, 6, 7, 8, 9],
-      autoRefresh: false,
       interval: {},
       active: 0
     };
@@ -72,42 +71,34 @@ export default {
   destroyed() {
     clearInterval(this.interval);
   },
-  created() {
+  mounted(){
+    console.log("mounted")
     this.refresh();
   },
   methods: {
-    shuffle: function() {
-      this.items = _.shuffle(this.items);
-    },
-
     refresh() {
       let that = this;
-      if (!this.autoRefresh) {
-        this.interval = setInterval(function() {
-          console.log("刷新~~");
-          that.$axios
-            .post(that.url + "get_rank", { who: "team" })
-            .then(res => {
-              console.log(res);
-              if (res.data.isOk) {
-                console.log("获取信息成功");
-                that.teams = res.data.teams;
-                that.users = res.data.users;
-                that.teams = that.teams.sort((a, b) => b[2] - a[2]);
-              } else {
-                console.log("获取信息失败，请检查是否有授权信息");
-                that.show_toast(res.data.errmsg, 1);
-              }
-            })
-            .catch(res => {
-              console.log(res);
-              that.show_toast("服务器连接失败！", 1);
-            });
-        }, 4000);
-      } else {
-        window.clearInterval(this.interval);
-      }
-      this.autoRefresh = !this.autoRefresh;
+      this.interval = setInterval(function() {
+        console.log("刷新~~");
+        that.$axios
+          .post(that.url + "get_rank", { who: "team" })
+          .then(res => {
+            console.log(res);
+            if (res.data.isOk) {
+              console.log("获取信息成功");
+              that.teams = res.data.teams;
+              that.users = res.data.users;
+              that.teams = that.teams.sort((a, b) => b[2] - a[2]);
+            } else {
+              console.log("获取信息失败，请检查是否有授权信息");
+              that.show_toast(res.data.errmsg, 1);
+            }
+          })
+          .catch(res => {
+            console.log(res);
+            that.show_toast("服务器连接失败！", 1);
+          });
+      }, 4000);
     },
     show_toast(string, type) {
       // console.log(string)
