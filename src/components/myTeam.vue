@@ -43,7 +43,7 @@
                   <mu-dialog title="解散队伍" width="400px" max-width="80%" :esc-press-close="false" :overlay-close="false" :open.sync="openDel">
                     确认解散队伍？你的队员将无家（队）可归！
                     <mu-button slot="actions" @click="openDel = false">我再想想</mu-button>
-                    <mu-button slot="actions" v-loading="loading2" data-mu-loading-size="24" color="red" @click="delTeam">我意已决 </mu-button>
+                    <mu-button slot="actions" v-loading="loading2" data-mu-loading-size="24" :disabled="loading2" color="red" @click="delTeam">我意已决 </mu-button>
                   </mu-dialog>
 
                 </mu-list-item-action>
@@ -111,7 +111,7 @@
                       </mu-form-item>
                     </mu-form>
                     <mu-button slot="actions" @click="openRegister = false">返回</mu-button>
-                    <mu-button v-loading="loading4" data-mu-loading-size="24" slot="actions" color="success" @click="submitEnroll">
+                    <mu-button v-loading="loading4" data-mu-loading-size="24" :disabled="loading4" slot="actions" color="success" @click="submitEnroll">
                       <span v-if="!userInfo.tel">确认报名</span>
                       <span v-else>确认修改</span>
                     </mu-button>
@@ -139,7 +139,7 @@
                         </mu-form-item>
                       </mu-form>
                       <mu-button slot="actions" @click="openNewTeam = false">返回</mu-button>
-                      <mu-button slot="actions" color="success" @click="submitCreate">确认创建</mu-button>
+                      <mu-button v-loading="loading5" data-mu-loading-size="24" :disabled="loading5" slot="actions" color="success" @click="submitCreate">确认创建</mu-button>
                     </mu-dialog>
 
                     <mu-dialog title="加入队伍" width="400px" max-width="80%" :esc-press-close="false" :overlay-close="false" :open.sync="openJoinTeam">
@@ -151,7 +151,7 @@
                         </span> <span v-if="teamFound.id"> id:{{teamFound.id}} 队长：{{teamFound.leader}}</span>
                       </mu-form>
                       <mu-button slot="actions" @click="openJoinTeam = false">返回</mu-button>
-                      <mu-button slot="actions" color="success" @click="submitJoin" :disabled="!teamFound.id">加入队伍</mu-button>
+                      <mu-button v-loading="loading5" data-mu-loading-size="24" :disabled="loading5 && !teamFound.id" slot="actions" color="success" @click="submitJoin">加入队伍</mu-button>
                     </mu-dialog>
 
                     <mu-button flat class="demo-step-button" @click="vhandlePrev">上一步</mu-button>
@@ -246,7 +246,7 @@
 </template>
 <script>
 // import QRCode from "qrcodejs2";
-var debounce = require('lodash.debounce');
+var debounce = require("lodash.debounce");
 export default {
   data() {
     return {
@@ -266,6 +266,7 @@ export default {
       loading2: false,
       loading3: false,
       loading4: false,
+      loading5: false,
 
       telRules: [
         {
@@ -391,6 +392,7 @@ export default {
     },
     submitCreate() {
       //创建队伍
+      this.loading5 = true;
       this.$refs.form.validate().then(result => {
         if (result) {
           this.$axios
@@ -406,10 +408,12 @@ export default {
                 this.show_toast(res.data.errmsg, 1);
               }
               this.refreshStep();
+              this.loading5 = false;
             })
             .catch(res => {
               // console.log(res);
               this.show_toast("服务器连接失败，请稍后重试。", 1);
+              this.loading5 = false;
             });
 
           console.log(this.newTeamForm);
@@ -418,6 +422,10 @@ export default {
     },
     submitJoin() {
       //加入队伍
+      if (!this.teamFound.id) {
+        return;
+      }
+      this.loading5 = true;
       this.$axios
         .post(this.url + "join_team", this.teamFound)
         .then(res => {
@@ -431,10 +439,12 @@ export default {
             this.show_toast(res.data.errmsg, 1);
           }
           this.refreshStep();
+          this.loading5 = false;
         })
         .catch(res => {
           console.log(res);
           this.show_toast("服务器连接失败，请稍后重试。", 1);
+          this.loading5 = false;
         });
     },
 
@@ -442,7 +452,7 @@ export default {
       //可能会展示二维码
     },
     getTeam() {
-      this.teamFound.name = { name: "正在查询……" };
+      this.teamFound = { name: "正在查询……" };
       var that = this;
       if (this.teamFindForm.teamfind.length != 0) {
         this.$axios
