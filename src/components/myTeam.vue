@@ -360,7 +360,7 @@
         this.vactiveStep = 0;
       },
       submitEnroll() {
-        this.loading4 = true;
+        this.loading4 = true; 
         this.$refs.form.validate().then(result => {
           console.log("form valid: ", result);
           if (result) {
