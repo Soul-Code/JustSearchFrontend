@@ -1,6 +1,6 @@
 <template>
     <mu-container class="answer-main">
-        <mu-dialog title="Dialog" width="360" :open.sync="openDialog">
+        <mu-dialog title="Dialog" width="360" :esc-press-close="false" :overlay-close="false" :open.sync="openDialog">
             比赛时间未到~
             <mu-button slot="actions" flat color="primary" @click="go_out">Close</mu-button>
         </mu-dialog>

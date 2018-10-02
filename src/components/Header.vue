@@ -1,5 +1,7 @@
 <template>
-  <div>
+  <div >
+    
+  <div class="mu-appbar-fix">
     <mu-appbar v-if="!isPc" z-depth='0' color="grey800">
       <mu-button v-if="!isPc" @click="open = !open" icon slot="left">
         <mu-icon value="menu"></mu-icon>
@@ -43,8 +45,12 @@
         </mu-appbar>
       </mu-container>
     </mu-appbar>
+  </div>
     <mu-drawer :open.sync="open" :docked="docked" :right="position === 'right'">
       <mu-list>
+        <mu-list-item button @click="open = false" to="/justsoso">
+          <mu-list-item-title>比赛须知</mu-list-item-title>
+        </mu-list-item>
         <mu-list-item button @click="open = false" to="/justsoso/Answer">
           <mu-list-item-title>答题</mu-list-item-title>
         </mu-list-item>
@@ -66,6 +72,9 @@
 </template>
 <script>
 export default {
+  props: {
+    isLogined: Boolean
+  },
   data() {
     return {
       //Drawer
@@ -81,6 +90,10 @@ export default {
   },
   watch: {
     active() {
+      this.isLogin = localStorage.getItem("isLogin");
+    },
+    isLogined() {
+      console.log("登陆了");
       this.isLogin = localStorage.getItem("isLogin");
     }
   },
@@ -140,6 +153,12 @@ export default {
 }
 .tabs {
   font-size: 1rem;
+}
+.mu-appbar-fix {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 999;
 }
 </style>
 
