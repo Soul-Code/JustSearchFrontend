@@ -29,7 +29,7 @@
 
                 <mu-list-item-action v-if="userInfo.team.score==0">
                   <mu-tooltip v-if="userInfo.team.leader != userInfo.name" placement="top" content="退出队伍">
-                    <mu-button icon color="blue" @click="quitTeam(userInfo.id)">
+                    <mu-button icon color="blue" @click="quitTeam(userInfo.id,false)">
                       <mu-icon value="reply"></mu-icon>
                     </mu-button>
                   </mu-tooltip>
@@ -70,7 +70,7 @@
                 </mu-list-item-content>
                 <mu-list-item-action v-if="userInfo.team.leader == userInfo.name && mem.name !=userInfo.name && userInfo.team.score==0">
                   <mu-tooltip placement="top" content="踢出队员">
-                    <mu-button @click="quitTeam(mem.id)" icon color="error">
+                    <mu-button @click="quitTeam(mem.id,true)" icon color="error">
                       <mu-icon value="close"></mu-icon>
                     </mu-button>
                   </mu-tooltip>
@@ -93,12 +93,9 @@
                     <span v-if="!userInfo.tel">登陆成功，现在点击下面的按钮输入信息来报名~</span>
                     <span v-else>报名成功，您现在可以点击下面的按钮修改信息~</span>
                   </p>
-                  <mu-button 
-                  class="demo-step-button" 
-                  @click="openRegister = true;
+                  <mu-button class="demo-step-button" @click="openRegister = true;
                           validateForm.tel=userInfo.tel;
-                          validateForm.qq=userInfo.qq" 
-                  color="primary">
+                          validateForm.qq=userInfo.qq" color="primary">
                     <span v-if="!userInfo.tel">点我报名</span>
                     <span v-else>修改信息</span>
                   </mu-button>
@@ -150,8 +147,8 @@
                         <mu-form-item label-float label="队伍id/名称/队长" help-text="优先匹配id" prop="teamfind" :rules="teamfindRules">
                           <mu-text-field type="text" v-model="teamFindForm.teamfind" prop="teamfind"></mu-text-field>
                         </mu-form-item>
-                      <span v-if="teamFound.name" style="color:#000;padding-right:10px"> <strong>{{teamFound.name}}</strong>
-                      </span> <span v-if="teamFound.id"> id:{{teamFound.id}} 队长：{{teamFound.leader}}</span>
+                        <span v-if="teamFound.name" style="color:#000;padding-right:10px"> <strong>{{teamFound.name}}</strong>
+                        </span> <span v-if="teamFound.id"> id:{{teamFound.id}} 队长：{{teamFound.leader}}</span>
                       </mu-form>
                       <mu-button slot="actions" @click="openJoinTeam = false">返回</mu-button>
                       <mu-button slot="actions" color="success" @click="submitJoin" :disabled="!teamFound.id">加入队伍</mu-button>
@@ -249,7 +246,7 @@
 </template>
 <script>
 // import QRCode from "qrcodejs2";
-let lodash = require("lodash");
+var debounce = require('lodash.debounce');
 export default {
   data() {
     return {
@@ -350,7 +347,7 @@ export default {
     }
   },
   created: function() {
-    this.debouncedGetTeam = _.debounce(this.getTeam, 500);
+    this.debouncedGetTeam = debounce(this.getTeam, 500);
   },
   methods: {
     vhandleNext() {
@@ -465,9 +462,8 @@ export default {
     },
     quitTeam(memid, isLeader) {
       this.$axios
-        .post(this.url + "quit_team", {
-          id: memid
-        })
+
+        .post(this.url + "quit_team", { id: memid })
         .then(res => {
           console.log(res);
           if (!isLeader) {
