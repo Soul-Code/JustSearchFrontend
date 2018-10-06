@@ -33,27 +33,18 @@
       <!-- <div slot="header">1.我我是题目的内容我是题目的内容我是题目的内容我是题目的内容</div>
             <mu-radio value="q1" v-model="questions.answer" label="A.有毒"></mu-radio>
             <mu-radio value="q2" v-model="questions.answer" label="B.没毒"></mu-radio> -->
-      <div slot="header">{{question.question_text}}</div>
+      <div slot="header" style="margin:15px 10px">{{question.fields.question_text}}</div>
       <mu-flex class="select-control-group" align-items="center" wrap="wrap">
-        <mu-flex class="select-control-row" justify-content="right"  fill :key="item" v-for="item in question.choices.split(',')">
+        <mu-flex class="select-control-row" justify-content="right"  fill :key="item" v-for="item in question.fields.choices.split(',')">
           <mu-radio :value="item" v-model="questions.answer" :label="item+' '+' '+' '"></mu-radio>
         </mu-flex>
       </mu-flex>
       <mu-button slot="action" flat color="primary">提交答案</mu-button>
     </mu-expansion-panel>
 
-    <mu-expansion-panel>
-      <div slot="header">Panel 2</div>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex, sit amet blandit leo
-      lobortis eget.
-    </mu-expansion-panel>
-    <mu-expansion-panel>
-      <div slot="header">Panel 3</div>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex, sit amet blandit leo
-      lobortis eget.
-    </mu-expansion-panel>
+    
     <mu-flex justify-content="center" style="margin: 32px 0;">
-      <mu-pagination raised :total="1000" :current.sync="current" @change="change_pages"></mu-pagination>
+      <mu-pagination raised :total="page_count" :current.sync="current" @change="change_pages"></mu-pagination>
     </mu-flex>
   </mu-container>
 </template>
@@ -75,22 +66,39 @@
     data() {
       return {
         openDialog: false,
-        current: 3,
+        page_count:0,
+        current: 1,
         activeStep: 1,
         questions: [{
-            id: '0',
-            question_text: '问题描述1',
-            choices: '有毒,没毒,我不知道~'
+          "model":"",
+          "fields":{
+            "question_text":"",
+            "difficulty":0,
+            "choices":""        
           },
-          {
-            id: '1',
-            question_text: '问题描述2',
-            choices: '有气222222222222222222222222222222222222,有气222222222222222222222222222222222222,有气222222222222222222222222222222222222,有气222222222222222222222222222222222222'
-          },
-        ]
+          "pk":0,
+        }],
       };
     },
-    created() {},
+    created() {
+        var that = this;
+        
+        this.$axios
+          .post(this.url + "get_questions/"+(this.current).toString())
+          .then(res => {
+            console.log(res);
+            if (res.data.isOk) {
+              this.questions = res.data.questions
+              this.page_count = res.data.page_count
+             
+            } else {
+              this.questions = [];
+            }
+          })
+          .catch(res=>{
+            this.show_toast("请再次刷新",1)
+          });
+    },
     mounted() {},
     computed: {
     //   question_comped() {
@@ -107,7 +115,30 @@
         this.$router.push("myTeam");
       },
       change_pages(){
-          this.questions[1].question_text = "lalala"+this.current
+        var that = this;
+     
+        this.$axios
+          .post(this.url + "get_questions/"+(this.current).toString())
+          .then(res => {
+            console.log(res);
+            if (res.data.isOk) {
+              this.questions = res.data.questions
+              this.page_count = res.data.page_count
+               
+            } else {
+              this.questions = [];
+            }
+          })
+          .catch(res=>{
+            this.show_toast("请再次刷新",1)
+          });
+      },
+      show_toast(string,type){
+        if (type == 1) {
+        this.$toast.error(string);
+      } else {
+        this.$toast.success(string);
+      }
       }
     }
   };
