@@ -78,6 +78,7 @@
           },
           "pk":0,
         }],
+        stages:[]
       };
     },
     created() {
@@ -98,6 +99,15 @@
           .catch(res=>{
             this.show_toast("请再次刷新",1)
           });
+        this.$axios
+          .post(this.url +"get_stages")
+          .then(res=>{
+            this.stages = res.data.stages
+            console.log(this.stages)
+          })
+          .catch(res=>{
+            this.show_toast("请再次刷新",1)
+          })
     },
     mounted() {},
     computed: {
