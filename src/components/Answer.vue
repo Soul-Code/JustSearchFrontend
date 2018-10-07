@@ -28,7 +28,7 @@
         </mu-step>
       </mu-stepper>
       <mu-menu placement="top-start" open-on-hover :open.sync="show">
-        <mu-button color="info" class="btn-page-setting">显示</mu-button>
+        <mu-button color="primary" class="btn-page-setting">显示</mu-button>
         <mu-list slot="content">
           <mu-list-item button @click="show_answered = !show_answered">
             <mu-list-item-title>显示已答</mu-list-item-title>
@@ -48,7 +48,7 @@
 
 
     <mu-flex class="demo-linear-progress">
-      <mu-linear-progress :value="linear" mode="determinate" size=5 color="green"></mu-linear-progress>
+      <mu-linear-progress :value="(linear/page_count)*100" mode="determinate" size=5 color="green"></mu-linear-progress>
     </mu-flex>
 
 
@@ -59,7 +59,7 @@
       <mu-flex slot="header" style="margin:13px 10px;font-size:16px" fill direction="row" justify-content="between"
         align-items="center">
         {{question.pk}}.{{question.fields.question_text}}
-        <mu-button slot="action" flat color="primary" @click.stop="submit_answer(question.pk,index)">提交答案</mu-button>
+        <mu-button slot="action" :color="questions[index].answered_num==2?'red':'primary'"  @click.stop="submit_answer(question.pk,index)">{{questions[index].answered_num==1?"再次提交":(questions[index].answered_num==2?"不能再提交了哦":"提交答案")}}</mu-button>
       </mu-flex>
       <mu-flex class="select-control-group"  wrap="wrap">
         <mu-flex class="select-control-row"  fill :key="item" v-for="item in question.fields.choices.split(',')">
@@ -75,7 +75,7 @@
 </template>
 <style>
 .demo-linear-progress{
-  margin:20px 0;
+  margin:0 0;
 }
   .answer-main {
     margin-top: 10px;
@@ -120,6 +120,7 @@
         show_answered: true,
         linear:0,
         expand_list:[false,false,false,false,false,false,false,false,false,false],
+        
 
       };
     },
@@ -133,6 +134,7 @@
           if (res.data.isOk) {
             this.questions = res.data.questions;
             this.page_count = res.data.page_count;
+            console.log("page_count",this.page_count)
             console.log("test:",this.questions[1].answered_num)
           } else {
             this.questions = [];
@@ -192,7 +194,12 @@
         }
       },
       submit_answer(pk, index) {
+        if(this.questions[index].answered_num==0){
+          this.linear = this.linear+1
+        }
+        if(this.questions[index].answered_num<2){
         this.questions[index].answered_num = this.questions[index].answered_num + 1;
+        }
 
 
       },
