@@ -46,23 +46,21 @@
       </mu-menu>
     </mu-flex>
 
-
     <mu-flex class="demo-linear-progress">
       <mu-linear-progress :value="(linear/page_count)*100" mode="determinate" size=5 color="green"></mu-linear-progress>
     </mu-flex>
 
-
-    <mu-expansion-panel :expand="expand_list[index]" @change="panel_change(index)"   :key="question.pk" v-for="(question,index) in questions">
+    <mu-expansion-panel :style="questions[index].answered_num>=2?'pointer-events: none;':''" :expand="expand_list[index]" @change="panel_change(index)" :key="question.pk" v-for="(question,index) in questions">
       <!-- <div slot="header">1.我我是题目的内容我是题目的内容我是题目的内容我是题目的内容</div>
             <mu-radio value="q1" v-model="questions.answer" label="A.有毒"></mu-radio>
             <mu-radio value="q2" v-model="questions.answer" label="B.没毒"></mu-radio> -->
-      <mu-flex slot="header" style="margin:13px 10px;font-size:16px" fill direction="row" justify-content="between"
-        align-items="center">
+      <mu-flex slot="header" style="margin:13px 10px;font-size:16px" fill direction="row" justify-content="between" align-items="center">
         {{question.pk}}.{{question.fields.question_text}}
-        <mu-button slot="action" :color="questions[index].answered_num==2?'red':'primary'"  @click.stop="submit_answer(question.pk,index)">{{questions[index].answered_num==1?"再次提交":(questions[index].answered_num==2?"不能再提交了哦":"提交答案")}}</mu-button>
+        <mu-button slot="action" :color="questions[index].answered_num==2?'red':'primary'" @click.stop="submit_answer(question.pk,index)">{{questions[index].answered_num==1?"再次提交":
+          (questions[index].answered_num>=2?"不能再提交了哦":"提交答案")}}</mu-button>
       </mu-flex>
-      <mu-flex class="select-control-group"  wrap="wrap">
-        <mu-flex class="select-control-row"  fill :key="item" v-for="item in question.fields.choices.split(',')">
+      <mu-flex class="select-control-group" wrap="wrap">
+        <mu-flex class="select-control-row" fill :key="item" v-for="item in question.fields.choices.split(',')">
           <mu-radio :value="item" v-model="questions.answer" :label="item+' '+' '+' '"></mu-radio>
         </mu-flex>
       </mu-flex>
@@ -74,38 +72,38 @@
   </mu-container>
 </template>
 <style>
-.demo-linear-progress{
-  margin:0 0;
+.demo-linear-progress {
+  margin: 0 0;
 }
-  .answer-main {
-    margin-top: 10px;
-  }
+.answer-main {
+  margin-top: 10px;
+}
 
-  .content-stepper {
-    width: 70%;
-    min-width: 420px;
-  }
+.content-stepper {
+  width: 70%;
+  min-width: 420px;
+}
 
-  .select-control-row {
-    margin: 10px 10px;
-  }
+.select-control-row {
+  margin: 10px 10px;
+}
 
-  @media screen and (max-width: 500px) {
-    .btn-page-setting {
-      margin-bottom: 15px;
-    }
+@media screen and (max-width: 500px) {
+  .btn-page-setting {
+    margin-bottom: 15px;
   }
-
+}
 </style>
 <script>
-  export default {
-    data() {
-      return {
-        openDialog: false,
-        page_count: 0,
-        current: 1,
-        activeStep: 1,
-        questions: [{
+export default {
+  data() {
+    return {
+      openDialog: false,
+      page_count: 0,
+      current: 1,
+      activeStep: 1,
+      questions: [
+        {
           model: "",
           fields: {
             question_text: "",
@@ -113,29 +111,71 @@
             choices: ""
           },
           pk: 0,
-          submit_times: 0,
-        }],
-        stages: [],
-        show: false,
-        show_answered: true,
-        linear:0,
-        expand_list:[false,false,false,false,false,false,false,false,false,false],
-        
+          submit_times: 0
+        }
+      ],
+      stages: [],
+      show: false,
+      show_answered: true,
+      linear: 0,
+      expand_list: [false, false, false, false, false, false, false, false, false, false]
+    };
+  },
+  created() {
+    var that = this;
 
-      };
+    this.$axios
+      .post(this.url + "get_questions")
+      .then(res => {
+        console.log(res);
+        if (res.data.isOk) {
+          this.questions = res.data.questions;
+          this.page_count = res.data.page_count;
+          this.linear = res.data.answered_num_all;
+          console.log("page_count", this.page_count);
+          console.log("test:", this.questions[1].answered_num);
+        } else {
+          this.questions = [];
+        }
+      })
+      .catch(res => {
+        this.show_toast("请再次刷新", 1);
+      });
+    this.$axios
+      .post(this.url + "get_stages")
+      .then(res => {
+        console.log(res);
+        this.stages = res.data.stages;
+        console.log(Date);
+      })
+      .catch(res => {
+        this.show_toast("请再次刷新", 1);
+      });
+  },
+  mounted() {},
+  computed: {
+    //   question_comped() {
+    // //   console.log(text)
+    // //    var array =  text.split(",")
+    // //    console.log(array)
+    //     console.log(this.questions[1].choices)
+    //    return 2
+    //   }
+  },
+  methods: {
+    go_out() {
+      this.$router.push("myTeam");
     },
-    created() {
+    change_pages() {
       var that = this;
 
       this.$axios
-        .post(this.url + "get_questions")
+        .post(this.url + "get_questions/" + this.current.toString())
         .then(res => {
           console.log(res);
           if (res.data.isOk) {
             this.questions = res.data.questions;
             this.page_count = res.data.page_count;
-            console.log("page_count",this.page_count)
-            console.log("test:",this.questions[1].answered_num)
           } else {
             this.questions = [];
           }
@@ -143,82 +183,38 @@
         .catch(res => {
           this.show_toast("请再次刷新", 1);
         });
-      this.$axios
-        .post(this.url + "get_stages")
-        .then(res => {
-          console.log(res);
-          this.stages = res.data.stages;
-          console.log(Date)
-        })
-        .catch(res => {
-          this.show_toast("请再次刷新", 1);
-        });
     },
-    mounted() {},
-    computed: {
-      //   question_comped() {
-      // //   console.log(text)
-      // //    var array =  text.split(",")
-      // //    console.log(array)
-      //     console.log(this.questions[1].choices)
-      //    return 2
-      //   }
+    show_toast(string, type) {
+      if (type == 1) {
+        this.$toast.error(string);
+      } else {
+        this.$toast.success(string);
+      }
     },
-    methods: {
-      go_out() {
-        this.$router.push("myTeam");
-      },
-      change_pages() {
-        var that = this;
-
-        this.$axios
-          .post(this.url + "get_questions/"+ this.current.toString())
-          .then(res => {
-            console.log(res);
-            if (res.data.isOk) {
-              this.questions = res.data.questions;
-              this.page_count = res.data.page_count;
-            } else {
-              this.questions = [];
-            }
-          })
-          .catch(res => {
-            this.show_toast("请再次刷新", 1);
-          });
-      },
-      show_toast(string, type) {
-        if (type == 1) {
-          this.$toast.error(string);
-        } else {
-          this.$toast.success(string);
-        }
-      },
-      submit_answer(pk, index) {
-        if(this.questions[index].answered_num==0){
-          this.linear = this.linear+1
-        }
-        if(this.questions[index].answered_num<2){
+    submit_answer(pk, index) {
+      if (this.questions[index].answered_num == 0) {
+        this.linear = this.linear + 1;
+      }
+      if (this.questions[index].answered_num < 2) {
         this.questions[index].answered_num = this.questions[index].answered_num + 1;
-        }
+      }
+      if (this.questions[index].answered_num == 2) {
+        this.expand_list[index]=false
+      }
+    },
+    expand_all() {},
+    close_all() {},
+    panel_change(index) {
+      console.log("num in", this.questions[index].answered_num);
 
-
-      },
-      expand_all() {},
-      close_all() {},
-      panel_change(index){
-         console.log("num in",this.questions[index].answered_num)
-        
-        if(this.questions[index].answered_num >= 2){
-          this.expand_list[index] = false;
-          console.log("panel_change",this.expand_list[index])
-        }
-        else{
-           this.expand_list[index] =!this.expand_list[index];
-          console.log("panel_change",this.expand_list[index])
-        }
-        
+      if (this.questions[index].answered_num >= 2) {
+        this.expand_list[index] = false;
+        console.log("panel_change", this.expand_list[index]);
+      } else {
+        this.expand_list[index] = !this.expand_list[index];
+        console.log("panel_change", this.expand_list[index]);
       }
     }
-  };
-
+  }
+};
 </script>
