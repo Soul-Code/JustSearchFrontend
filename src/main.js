@@ -18,7 +18,7 @@ import App from "./App.vue";
 import axios from "axios";
 axios.defaults.withCredentials = true;
 axios.interceptors.request.use(config => {
-  // console.log(document.cookie);
+  console.log(document.cookie);
   config.headers["X-Requested-With"] = "XMLHttpRequest";
   let regex = /.*csrftoken=([^;.]*).*$/;
   config.headers["X-CSRFToken"] =
