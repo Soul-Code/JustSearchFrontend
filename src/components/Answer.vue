@@ -30,12 +30,7 @@
       <mu-menu placement="top-start" open-on-hover :open.sync="show">
         <mu-button color="primary" class="btn-page-setting">显示</mu-button>
         <mu-list slot="content">
-          <!-- <mu-list-item button @click="show_answered = !show_answered"> -->
-          <!-- <mu-list-item-title>显示已答</mu-list-item-title>
-            <mu-list-item-action>
-              <mu-switch v-model="show_answered" readonly></mu-switch>
-            </mu-list-item-action> -->
-          <!-- </mu-list-item> -->
+      
           <mu-list-item button @click="expand_all">
             <mu-list-item-title>展开所有</mu-list-item-title>
           </mu-list-item>
@@ -44,6 +39,11 @@
           </mu-list-item>
         </mu-list>
       </mu-menu>
+
+      <mu-paper class="demo-paper" :z-depth="4">
+        <p>{{time}}</p>
+      </mu-paper>
+
     </mu-flex>
 
     <mu-flex class="demo-linear-progress">
@@ -51,9 +51,7 @@
     </mu-flex>
 
     <mu-expansion-panel v-for="(question,index) in questions" :style="questions[index].answered_num>=2?'pointer-events: none;':''" :expand.sync="expand_list[index]" @change="panel_change(index)" :key="question.pk">
-      <!-- <div slot="header">1.我我是题目的内容我是题目的内容我是题目的内容我是题目的内容</div>
-            <mu-radio value="q1" v-model="questions.answer" label="A.有毒"></mu-radio>
-            <mu-radio value="q2" v-model="questions.answer" label="B.没毒"></mu-radio> -->
+    
       <mu-flex slot="header" style="margin:13px 10px;font-size:16px" fill direction="row" justify-content="between" align-items="center">
         {{question.pk}}.{{question.fields.question_text}}
         <mu-button slot="action" :color="questions[index].answered_num==2?'red':'primary'" @click.stop="submit_answer(question.pk,index)">{{questions[index].answered_num==1?"再次提交":
@@ -87,6 +85,12 @@
 .select-control-row {
   margin: 10px 10px;
 }
+.demo-paper{
+  width: 150px;
+  text-align: center;
+  height: 50px;
+  margin: 10px 20px
+}
 
 @media screen and (max-width: 500px) {
   .btn-page-setting {
@@ -119,7 +123,8 @@ export default {
       show_answered: true,
       linear: 0,
       expand_list: [false, false, false, false, false, false, false, false, false, false],
-      answers: new Array(10)
+      answers: new Array(10),
+      times:10,
     };
   },
   created() {
@@ -147,13 +152,19 @@ export default {
       .then(res => {
         console.log(res);
         this.stages = res.data.stages;
+        setInterval(function() {
+        this.times -= 1; 
+        console.log(this.times)
+    }, 1000);
         console.log(Date);
       })
       .catch(res => {
         this.show_toast("请再次刷新", 1);
       });
   },
-  mounted() {},
+  mounted() {
+  
+  },
   computed: {
     //   question_comped() {
     // //   console.log(text)
@@ -193,6 +204,10 @@ export default {
       }
     },
     submit_answer(pk, index) {
+      if(this.answers[index]===undefined){
+        console.log('undefined');
+        return
+      }
       if (this.questions[index].answered_num == 0) {
         this.linear = this.linear + 1;
       }
@@ -202,10 +217,8 @@ export default {
       if (this.questions[index].answered_num >= 2) {
         this.expand_list[index] = false;
       }
-      if(this.answers[index]===undefined){
-        console.log('undefined');
-        return
-      }
+      console.log(this.questions[[index].answered_num])
+      
       this.$axios
         .post(this.url + "submit_answer", { question_pk: pk, choice: this.answers[index] })
         .then(res => {
@@ -244,17 +257,7 @@ export default {
 
       this.show = false;
     },
-    panel_change(index) {
-      console.log("num in", this.questions[index].answered_num);
-
-      // if (this.questions[index].answered_num >= 2) {
-      //   this.expand_list[index] = false;
-      //   console.log("panel_change", this.expand_list[index]);
-      // } else {
-      //   this.expand_list[index] = !this.expand_list[index];
-      //   console.log("panel_change", this.expand_list[index]);
-      // }
-    }
+   
   }
 };
 </script>
