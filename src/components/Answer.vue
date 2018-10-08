@@ -50,7 +50,7 @@
       <mu-linear-progress :value="(linear/page_count)*100" mode="determinate" size=5 color="green"></mu-linear-progress>
     </mu-flex>
 
-    <mu-expansion-panel v-for="(question,index) in questions" :style="questions[index].answered_num>=2?'pointer-events: none;':''" :expand.sync="expand_list[index]" :key="question.pk">
+    <mu-expansion-panel v-for="(question,index) in questions" :style="questions[index].answered_num>=2?'pointer-events: none;':''" :expand.sync="expand_list[index]" @change="panel_change(index)" :key="question.pk">
       <!-- <div slot="header">1.我我是题目的内容我是题目的内容我是题目的内容我是题目的内容</div>
             <mu-radio value="q1" v-model="questions.answer" label="A.有毒"></mu-radio>
             <mu-radio value="q2" v-model="questions.answer" label="B.没毒"></mu-radio> -->
@@ -119,12 +119,10 @@ export default {
       show_answered: true,
       linear: 0,
       expand_list: [false, false, false, false, false, false, false, false, false, false],
-      answers: new Array(10),
-      time_now:0,
+      answers: new Array(10)
     };
   },
   created() {
-    
     var that = this;
 
     this.$axios
@@ -149,31 +147,21 @@ export default {
       .then(res => {
         console.log(res);
         this.stages = res.data.stages;
-        this.time_now = res.data.time_now;
         console.log(Date);
-        if(this.stages[0].fields.timeStart<this.time_now<this.stages[0].fields.timeEnd){
-        this.activeStep=0;
-      }
-       else if(this.stages[1].fields.timeStart<this.time_now<this.stages[1].fields.timeEnd){
-        this.activeStep=1;
-      }
-      else if(this.stages[2].fields.timeStart<this.time_now<this.stages[2].fields.timeEnd){
-        this.activeStep=2;
-      }
-       else if(this.stages[3].fields.timeStart<this.time_now<this.stages[3].fields.timeEnd){
-        this.activeStep=3;
-      }
       })
       .catch(res => {
         this.show_toast("请再次刷新", 1);
       });
-      
-
-     
   },
   mounted() {},
   computed: {
-
+    //   question_comped() {
+    // //   console.log(text)
+    // //    var array =  text.split(",")
+    // //    console.log(array)
+    //     console.log(this.questions[1].choices)
+    //    return 2
+    //   }
   },
   methods: {
     go_out() {
@@ -196,10 +184,6 @@ export default {
         .catch(res => {
           this.show_toast("请再次刷新", 1);
         });
-         for (var i = 0; i < this.questions.length; i++) {
-        this.expand_list[i] = false;
-      }
-
     },
     show_toast(string, type) {
       if (type == 1) {
@@ -209,10 +193,6 @@ export default {
       }
     },
     submit_answer(pk, index) {
-       if(this.answers[index]===undefined){
-        console.log('undefined');
-        return
-      }
       if (this.questions[index].answered_num == 0) {
         this.linear = this.linear + 1;
       }
@@ -222,7 +202,10 @@ export default {
       if (this.questions[index].answered_num >= 2) {
         this.expand_list[index] = false;
       }
-     
+      if(this.answers[index]===undefined){
+        console.log('undefined');
+        return
+      }
       this.$axios
         .post(this.url + "submit_answer", { question_pk: pk, choice: this.answers[index] })
         .then(res => {
