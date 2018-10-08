@@ -30,12 +30,12 @@
       <mu-menu placement="top-start" open-on-hover :open.sync="show">
         <mu-button color="primary" class="btn-page-setting">显示</mu-button>
         <mu-list slot="content">
-          <mu-list-item button @click="show_answered = !show_answered">
-            <mu-list-item-title>显示已答</mu-list-item-title>
+          <!-- <mu-list-item button @click="show_answered = !show_answered"> -->
+          <!-- <mu-list-item-title>显示已答</mu-list-item-title>
             <mu-list-item-action>
               <mu-switch v-model="show_answered" readonly></mu-switch>
-            </mu-list-item-action>
-          </mu-list-item>
+            </mu-list-item-action> -->
+          <!-- </mu-list-item> -->
           <mu-list-item button @click="expand_all">
             <mu-list-item-title>展开所有</mu-list-item-title>
           </mu-list-item>
@@ -50,7 +50,7 @@
       <mu-linear-progress :value="(linear/page_count)*100" mode="determinate" size=5 color="green"></mu-linear-progress>
     </mu-flex>
 
-    <mu-expansion-panel :style="questions[index].answered_num>=2?'pointer-events: none;':''" :expand="expand_list[index]" @change="panel_change(index)" :key="question.pk" v-for="(question,index) in questions">
+    <mu-expansion-panel v-for="(question,index) in questions" :style="questions[index].answered_num>=2?'pointer-events: none;':''" :expand.sync="expand_list[index]" @change="panel_change(index)" :key="question.pk">
       <!-- <div slot="header">1.我我是题目的内容我是题目的内容我是题目的内容我是题目的内容</div>
             <mu-radio value="q1" v-model="questions.answer" label="A.有毒"></mu-radio>
             <mu-radio value="q2" v-model="questions.answer" label="B.没毒"></mu-radio> -->
@@ -60,8 +60,8 @@
           (questions[index].answered_num>=2?"不能再提交了哦":"提交答案")}}</mu-button>
       </mu-flex>
       <mu-flex class="select-control-group" wrap="wrap">
-        <mu-flex class="select-control-row" fill :key="item" v-for="item in question.fields.choices.split(',')">
-          <mu-radio :value="item" v-model="questions.answer" :label="item+' '+' '+' '"></mu-radio>
+        <mu-flex class="select-control-row" fill :key="item" v-for="(item,i) in question.fields.choices.split(',')">
+          <mu-radio :value="i" v-model="answers[index]" :label="item+' '+' '+' '"></mu-radio>
         </mu-flex>
       </mu-flex>
     </mu-expansion-panel>
@@ -118,7 +118,8 @@ export default {
       show: false,
       show_answered: true,
       linear: 0,
-      expand_list: [false, false, false, false, false, false, false, false, false, false]
+      expand_list: [false, false, false, false, false, false, false, false, false, false],
+      answers: new Array(10)
     };
   },
   created() {
@@ -198,22 +199,61 @@ export default {
       if (this.questions[index].answered_num < 2) {
         this.questions[index].answered_num = this.questions[index].answered_num + 1;
       }
-      if (this.questions[index].answered_num == 2) {
-        this.expand_list[index]=false
+      if (this.questions[index].answered_num >= 2) {
+        this.expand_list[index] = false;
       }
+      if(this.answers[index]===undefined){
+        console.log('undefined');
+        return
+      }
+      this.$axios
+        .post(this.url + "submit_answer", { question_pk: pk, choice: this.answers[index] })
+        .then(res => {
+          // console.log(res);
+          if (res.data.isOk) {
+            console.log("提交成功", res);
+            this.show_toast("提交成功", 0);
+            // localStorage.setItem("isLogin", 1);
+            // localStorage.setItem("userid", this.validateForm.username);
+            // this.$router.push("myTeam");
+            // this.$emit("Login");
+          } else {
+            console.log("提交失败");
+            this.show_toast(res.data.errmsg, 1);
+            // this.loading1 = false;
+          }
+        })
+        .catch(res => {
+          // console.log(res);
+          this.show_toast("发生错误", 1);
+          // this.loading1 = false;
+        });
     },
-    expand_all() {},
-    close_all() {},
+    expand_all() {
+      for (var i = 0; i < this.questions.length; i++) {
+        if (this.questions[i].answered_num < 2) {
+          this.expand_list[i] = true;
+        }
+      }
+      this.show = false;
+    },
+    close_all() {
+      for (var i = 0; i < this.questions.length; i++) {
+        this.expand_list[i] = false;
+      }
+
+      this.show = false;
+    },
     panel_change(index) {
       console.log("num in", this.questions[index].answered_num);
 
-      if (this.questions[index].answered_num >= 2) {
-        this.expand_list[index] = false;
-        console.log("panel_change", this.expand_list[index]);
-      } else {
-        this.expand_list[index] = !this.expand_list[index];
-        console.log("panel_change", this.expand_list[index]);
-      }
+      // if (this.questions[index].answered_num >= 2) {
+      //   this.expand_list[index] = false;
+      //   console.log("panel_change", this.expand_list[index]);
+      // } else {
+      //   this.expand_list[index] = !this.expand_list[index];
+      //   console.log("panel_change", this.expand_list[index]);
+      // }
     }
   }
 };
