@@ -193,18 +193,9 @@ export default {
       }
     },
     submit_answer(pk, index) {
-      if (this.questions[index].answered_num == 0) {
-        this.linear = this.linear + 1;
-      }
-      if (this.questions[index].answered_num < 2) {
-        this.questions[index].answered_num = this.questions[index].answered_num + 1;
-      }
-      if (this.questions[index].answered_num >= 2) {
-        this.expand_list[index] = false;
-      }
-      if(this.answers[index]===undefined){
-        console.log('undefined');
-        return
+      if (this.answers[index] === undefined) {
+        console.log("undefined");
+        return;
       }
       this.$axios
         .post(this.url + "submit_answer", { question_pk: pk, choice: this.answers[index] })
@@ -213,10 +204,15 @@ export default {
           if (res.data.isOk) {
             console.log("提交成功", res);
             this.show_toast("提交成功", 0);
-            // localStorage.setItem("isLogin", 1);
-            // localStorage.setItem("userid", this.validateForm.username);
-            // this.$router.push("myTeam");
-            // this.$emit("Login");
+            if (this.questions[index].answered_num == 0) {
+              this.linear = this.linear + 1;
+            }
+            if (this.questions[index].answered_num < 2) {
+              this.questions[index].answered_num = this.questions[index].answered_num + 1;
+            }
+            if (this.questions[index].answered_num >= 2) {
+              this.expand_list[index] = false;
+            }
           } else {
             console.log("提交失败");
             this.show_toast(res.data.errmsg, 1);
@@ -241,12 +237,10 @@ export default {
       for (var i = 0; i < this.questions.length; i++) {
         this.expand_list[i] = false;
       }
-
       this.show = false;
     },
     panel_change(index) {
-      console.log("num in", this.questions[index].answered_num);
-
+      // console.log("num in", this.questions[index].answered_num);
       // if (this.questions[index].answered_num >= 2) {
       //   this.expand_list[index] = false;
       //   console.log("panel_change", this.expand_list[index]);
