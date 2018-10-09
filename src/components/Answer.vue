@@ -163,10 +163,13 @@
 
         flash_15: 15,
         flash_5: 15,
+        flash_last: 15,
         flash_15_flag: false,
         flash_5_flag: false,
+        flash_last_flag:false,
 
-
+        timer:null,
+        
         second: 0,
         minute: 0,
         hour: 0,
@@ -229,8 +232,8 @@
           }
 
           // this.stages[this.activeStep].fields.timeEnd - this.time_now
-          this.times =this.stages[this.activeStep].fields.timeEnd - this.time_now
-          setInterval(() => {
+          this.times = this.stages[this.activeStep].fields.timeEnd - this.time_now
+          this.timer = setInterval(() => {
 
             this.hour = this.times / (60 * 60)
             var middle = this.times % (60 * 60)
@@ -278,6 +281,9 @@
                 }
               }
             }
+            if(this.hour<1 && this.minute<1 && this.second<1){
+              clearInterval(this.timer);
+            }
 
             if (parseInt(this.hour) == 0 && parseInt(
                 this.minute) == 15)
@@ -315,7 +321,10 @@
                 this.font_size = "100%"
               }
               this.flash_5 -= 1;
-            } else if (parseInt(this.hour) == 0 && parseInt(this.minute) == 0 && parseInt(this.second) == 15) {
+            } else if (parseInt(this.hour) == 0 && parseInt(this.minute) == 0 && parseInt(this.second) == 15) 
+            this.flash_last_flag = true;
+            if(this.flash_last_flag && this.flash_last>=0)
+            {
               if (!this.color_flag) {
                 this.color_change = "#ff5252"
                 this.color_flag = true;
@@ -329,10 +338,12 @@
                 this.font_weight = "normal";
                 this.font_size = "100%"
               }
-              this.flash_5 -= 1;
+              this.flash_last -= 1;
             }
             this.times = this.times - 1
+            
           }, 1000);
+
           console.log(Date);
         })
         .catch(res => {
