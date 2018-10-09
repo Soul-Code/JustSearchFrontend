@@ -1,5 +1,5 @@
 <template>
-  <mu-container class="answer-main">
+  <mu-container id="orderFullScreen" class="answer-main">
     <mu-dialog title="Dialog" width="360" :esc-press-close="false" :overlay-close="false" :open.sync="openDialog">
       比赛时间未到~
       <mu-button slot="actions" flat color="primary" @click="go_out">Close</mu-button>
@@ -39,20 +39,24 @@
           </mu-list-item>
         </mu-list>
       </mu-menu>
-
-      <mu-paper class="demo-paper" :z-depth="4">
-        <p>{{times}}</p>
-      </mu-paper>
+      <!-- (scrollTop>84)?'top:50%':'top:10%' -->
 
     </mu-flex>
+    <mu-paper class="demo-paper" :style="{top:CountDown_position,'background-color':color_change,color:font_color,'font-weight':font_weight,'font-size':font_size}"
+      :z-depth="4">
+      <p>距离结束还有</p>
+      <p>{{CountDown}}</p>
+    </mu-paper>
 
     <mu-flex class="demo-linear-progress">
       <mu-linear-progress :value="(linear/page_count)*100" mode="determinate" size=5 color="green"></mu-linear-progress>
     </mu-flex>
 
-    <mu-expansion-panel v-for="(question,index) in questions" :style="questions[index].answered_num>=2?'pointer-events: none;':''" :expand.sync="expand_list[index]" @change="panel_change(index)" :key="question.pk">
+    <mu-expansion-panel class="expand_panel" v-for="(question,index) in questions" :style="questions[index].answered_num>=2?'pointer-events: none;':''"
+      :expand.sync="expand_list[index]" @change="panel_change(index)" :key="question.pk">
 
-      <mu-flex slot="header" style="margin:13px 10px;font-size:16px" fill direction="row" justify-content="between" align-items="center">
+      <mu-flex slot="header" style="margin:13px 10px;font-size:16px" fill direction="row" justify-content="between"
+        align-items="center">
         {{question.pk}}.{{question.fields.question_text}}
         <mu-button slot="action" :color="questions[index].answered_num==2?'red':'primary'" @click.stop="submit_answer(question.pk,index)">{{questions[index].answered_num==1?"再次提交":
           (questions[index].answered_num>=2?"不能再提交了哦":"提交答案")}}</mu-button>
@@ -70,44 +74,57 @@
   </mu-container>
 </template>
 <style>
-.demo-linear-progress {
-  margin: 0 0;
-}
-.answer-main {
-  margin-top: 10px;
-}
-
-.content-stepper {
-  width: 70%;
-  min-width: 420px;
-}
-
-.select-control-row {
-  margin: 10px 10px;
-}
-.demo-paper {
-  width: 150px;
-  text-align: center;
-  height: 50px;
-  margin: 10px 20px;
-}
-
-@media screen and (max-width: 500px) {
-  .btn-page-setting {
-    margin-bottom: 15px;
+  .demo-linear-progress {
+   margin-left: 80px;
+    margin-right: 80px;
   }
-}
+
+  .answer-main {
+    margin-top: 10px;
+  }
+
+  .content-stepper {
+    width: 70%;
+    min-width: 420px;
+  }
+
+  .select-control-row {
+    margin: 10px 10px;
+  }
+
+  .expand_panel {
+    margin-left: 80px;
+    margin-right: 80px;
+  }
+
+  .demo-paper {
+
+    width: 150px;
+    text-align: center;
+    height: 90px;
+    position: fixed;
+
+    right: 0;
+    z-index: 999;
+    margin: 10px 20px;
+  }
+
+  @media screen and (max-width: 500px) {
+    .btn-page-setting {
+      margin-bottom: 15px;
+    }
+  }
+
 </style>
 <script>
-export default {
-  data() {
-    return {
-      openDialog: false,
-      page_count: 0,
-      current: 1,
-      activeStep: 1,
-      questions: [
-        {
+  export default {
+    data() {
+      return {
+        openDialog: false,
+        page_count: 0,
+        current: 1,
+        activeStep: 1,
+        questions: [{
           model: "",
           fields: {
             question_text: "",
@@ -116,76 +133,62 @@ export default {
           },
           pk: 0,
           submit_times: 0
-        }
-      ],
-      stages: [],
-      show: false,
-      show_answered: true,
-      linear: 0,
-      expand_list: [false, false, false, false, false, false, false, false, false, false],
-      answers: new Array(10),
-      times: 10
-    };
-  },
-  created() {
-    var that = this;
+        }],
+        stages: [],
+        show: false,
+        show_answered: true,
+        linear: 0,
+        expand_list: [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        answers: new Array(10),
+        time_now: 0,
+        times: 0,
 
-    this.$axios
-      .post(this.url + "get_questions")
-      .then(res => {
-        console.log(res);
-        if (res.data.isOk) {
-          this.questions = res.data.questions;
-          this.page_count = res.data.page_count;
-          this.linear = res.data.answered_num_all;
-          console.log("page_count", this.page_count);
-          console.log("test:", this.questions[1].answered_num);
-        } else {
-          this.questions = [];
-        }
-      })
-      .catch(res => {
-        this.show_toast("请再次刷新", 1);
-      });
-    this.$axios
-      .post(this.url + "get_stages")
-      .then(res => {
-        console.log(res);
-        this.stages = res.data.stages;
-        setInterval(() => {
-          this.times -= 1;
-          console.log(this.times);
-        }, 1000);
-        console.log(Date);
-      })
-      .catch(res => {
-        this.show_toast("请再次刷新", 1);
-      });
-  },
-  mounted() {},
-  computed: {
-    //   question_comped() {
-    // //   console.log(text)
-    // //    var array =  text.split(",")
-    // //    console.log(array)
-    //     console.log(this.questions[1].choices)
-    //    return 2
-    //   }
-  },
-  methods: {
-    go_out() {
-      this.$router.push("myTeam");
+        CountDown_position: '10%',
+        color_change: "white",
+        color_flag: false,
+        font_color: "black",
+        font_weight: "normal",
+        font_size: "100%",
+
+        flash_15: 15,
+        flash_5: 15,
+        flash_15_flag: false,
+        flash_5_flag: false,
+
+
+        second: 0,
+        minute: 0,
+        hour: 0,
+
+        CountDown: "",
+
+        scrollTop: 0,
+      };
     },
-    change_pages() {
+    created() {
       var that = this;
 
       this.$axios
-        .post(this.url + "get_questions/" + this.current.toString())
+        .post(this.url + "get_questions")
         .then(res => {
           console.log(res);
           if (res.data.isOk) {
             this.questions = res.data.questions;
             this.page_count = res.data.page_count;
+            this.linear = res.data.answered_num_all;
+            console.log("page_count", this.page_count);
+            console.log("test:", this.questions[1].answered_num);
           } else {
             this.questions = [];
           }
@@ -193,68 +196,266 @@ export default {
         .catch(res => {
           this.show_toast("请再次刷新", 1);
         });
-    },
-    show_toast(string, type) {
-      if (type == 1) {
-        this.$toast.error(string);
-      } else {
-        this.$toast.success(string);
-      }
-    },
-    submit_answer(pk, index) {
-      if (this.answers[index] === undefined) {
-        console.log("undefined");
-        return;
-      }
-      if (this.questions[index].answered_num == 0) {
-        this.linear = this.linear + 1;
-      }
-      if (this.questions[index].answered_num < 2) {
-        this.questions[index].answered_num = this.questions[index].answered_num + 1;
-      }
-      if (this.questions[index].answered_num >= 2) {
-        this.expand_list[index] = false;
-      }
-      console.log(this.questions[[index].answered_num]);
-
       this.$axios
-        .post(this.url + "submit_answer", { question_pk: pk, choice: this.answers[index] })
+        .post(this.url + "get_stages")
         .then(res => {
-          // console.log(res);
-          if (res.data.isOk) {
-            console.log("提交成功", res);
-            this.show_toast("提交成功", 0);
-            // localStorage.setItem("isLogin", 1);
-            // localStorage.setItem("userid", this.validateForm.username);
-            // this.$router.push("myTeam");
-            // this.$emit("Login");
-          } else {
-            console.log("提交失败");
-            this.show_toast(res.data.errmsg, 1);
-            // this.loading1 = false;
+          console.log(res);
+          this.stages = res.data.stages;
+          this.time_now = res.data.time_now;
+          if (
+            this.stages[0].fields.timeStart <
+            this.time_now <
+            this.stages[0].fields.timeEnd
+          ) {
+            this.activeStep = 0;
+          } else if (
+            this.stages[1].fields.timeStart <
+            this.time_now <
+            this.stages[1].fields.timeEnd
+          ) {
+            this.activeStep = 1;
+          } else if (
+            this.stages[2].fields.timeStart <
+            this.time_now <
+            this.stages[2].fields.timeEnd
+          ) {
+            this.activeStep = 2;
+          } else if (
+            this.stages[3].fields.timeStart <
+            this.time_now <
+            this.stages[3].fields.timeEnd
+          ) {
+            this.activeStep = 3;
           }
+
+          // this.stages[this.activeStep].fields.timeEnd - this.time_now
+          this.times =this.stages[this.activeStep].fields.timeEnd - this.time_now
+          setInterval(() => {
+
+            this.hour = this.times / (60 * 60)
+            var middle = this.times % (60 * 60)
+            this.minute = (middle) / (60)
+            middle = middle % (60)
+            this.second = middle
+            if (parseInt(this.hour) >= 24) {
+              var day = this.hour/24;
+              var hour = this.hour%24
+              this.CountDown = parseInt(day).toString()+"天"+" "+parseInt(hour).toString()+"小时"
+
+            } else {
+              if (this.hour < 10) {
+                if (this.second < 10 && this.minute >= 10) {
+                  this.CountDown = '0' + parseInt(this.hour).toString() + ":" + parseInt(this.minute).toString() +
+                    ":0" +
+                    parseInt(this.second).toString()
+                } else if (this.second >= 10 && this.minute < 10) {
+                  this.CountDown = '0' + parseInt(this.hour).toString() + ":0" + parseInt(this.minute).toString() +
+                    ":" +
+                    parseInt(this.second).toString()
+                } else if (this.second < 10 && this.minute < 10) {
+                  this.CountDown = '0' + parseInt(this.hour).toString() + ":0" + parseInt(this.minute).toString() +
+                    ":0" +
+                    parseInt(this.second).toString()
+                } else {
+                  this.CountDown = '0' + parseInt(this.hour).toString() + ":" + parseInt(this.minute).toString() +
+                    ":" +
+                    parseInt(this.second).toString()
+                }
+              } else {
+                if (this.second < 10 && this.minute >= 10) {
+                  this.CountDown = parseInt(this.hour).toString() + ":" + parseInt(this.minute).toString() + ":0" +
+                    parseInt(this.second).toString()
+                } else if (this.second >= 10 && this.minute < 10) {
+                  this.CountDown = parseInt(this.hour).toString() + ":0" + parseInt(this.minute).toString() + ":" +
+                    parseInt(this.second).toString()
+                } else if (this.second < 10 && this.minute < 10) {
+                  this.CountDown = parseInt(this.hour).toString() + ":0" + parseInt(this.minute).toString() +
+                    ":0" +
+                    parseInt(this.second).toString()
+                } else {
+                  this.CountDown = parseInt(this.hour).toString() + ":" + parseInt(this.minute).toString() + ":" +
+                    parseInt(this.second).toString()
+                }
+              }
+            }
+
+            if (parseInt(this.hour) == 0 && parseInt(
+                this.minute) == 15)
+              this.flash_15_flag = true
+            if (this.flash_15_flag && this.flash_15 >= 0) {
+              if (!this.color_flag) {
+                this.color_change = "#ff5252"
+                this.color_flag = true;
+                this.font_color = "white"
+                this.font_weight = "bold";
+                this.font_size = "110%"
+              } else {
+                this.color_change = "white"
+                this.color_flag = false;
+                this.font_color = "black";
+                this.font_weight = "normal";
+                this.font_size = "100%"
+              }
+              this.flash_15 -= 1;
+            } else if (parseInt(this.hour) == 0 && parseInt(this.minute) == 5)
+              this.flash_5_flag = true
+            if (this.flash_5_flag && this.flash_5 >= 0) {
+              console.log("this is the flash function")
+              if (!this.color_flag) {
+                this.color_change = "#ff5252"
+                this.color_flag = true;
+                this.font_color = "white"
+                this.font_weight = "bold";
+                this.font_size = "110%"
+              } else {
+                this.color_change = "white"
+                this.color_flag = false;
+                this.font_color = "black";
+                this.font_weight = "normal";
+                this.font_size = "100%"
+              }
+              this.flash_5 -= 1;
+            } else if (parseInt(this.hour) == 0 && parseInt(this.minute) == 0 && parseInt(this.second) == 15) {
+              if (!this.color_flag) {
+                this.color_change = "#ff5252"
+                this.color_flag = true;
+                this.font_color = "white"
+                this.font_weight = "bold";
+                this.font_size = "110%"
+              } else {
+                this.color_change = "white"
+                this.color_flag = false;
+                this.font_color = "black";
+                this.font_weight = "normal";
+                this.font_size = "100%"
+              }
+              this.flash_5 -= 1;
+            }
+            this.times = this.times - 1
+          }, 1000);
+          console.log(Date);
         })
         .catch(res => {
-          // console.log(res);
-          this.show_toast("发生错误", 1);
-          // this.loading1 = false;
+          console.log("res in catch:", res)
+          this.show_toast("请再次刷新", 1);
         });
     },
-    expand_all() {
-      for (var i = 0; i < this.questions.length; i++) {
-        if (this.questions[i].answered_num < 2) {
-          this.expand_list[i] = true;
-        }
-      }
-      this.show = false;
-    },
-    close_all() {
-      for (var i = 0; i < this.questions.length; i++) {
-        this.expand_list[i] = false;
-      }
+    mounted() {
 
-      this.show = false;
-    }
-  }
-};
+
+      window.addEventListener("scroll", () => {
+        this.scrollTop = document.documentElement.scrollTop
+        if (this.scrollTop > 84) {
+          this.CountDown_position = '50%'
+        } else {
+          this.CountDown_position = '10%'
+        }
+      });
+    },
+    computed: {
+      //   question_comped() {
+      // //   console.log(text)
+      // //    var array =  text.split(",")
+      // //    console.log(array)
+      //     console.log(this.questions[1].choices)
+      //    return 2
+      //   }
+    },
+    methods: {
+      go_out() {
+        this.$router.push("myTeam");
+      },
+      change_pages() {
+        var that = this;
+        for (var i = 0; i < this.questions.length; i++) {
+          this.expand_list[i] = false;
+        }
+        this.$axios
+          .post(this.url + "get_questions/" + this.current.toString())
+          .then(res => {
+            console.log(res);
+            if (res.data.isOk) {
+              this.questions = res.data.questions;
+              this.page_count = res.data.page_count;
+            } else {
+              this.questions = [];
+            }
+          })
+          .catch(res => {
+            this.show_toast("请再次刷新", 1);
+          });
+      },
+      show_toast(string, type) {
+        if (type == 1) {
+          this.$toast.error(string);
+        } else {
+          this.$toast.success(string);
+        }
+      },
+      submit_answer(pk, index) {
+        if (this.answers[index] === undefined) {
+          console.log("undefined");
+          return;
+        }
+        if (this.questions[index].answered_num == 0) {
+          this.linear = this.linear + 1;
+        }
+        if (this.questions[index].answered_num < 2) {
+          this.questions[index].answered_num =
+            this.questions[index].answered_num + 1;
+        }
+        if (this.questions[index].answered_num >= 2) {
+          this.expand_list[index] = false;
+        }
+        console.log(this.questions[[index].answered_num]);
+
+        this.$axios
+          .post(this.url + "submit_answer", {
+            question_pk: pk,
+            choice: this.answers[index]
+          })
+          .then(res => {
+            // console.log(res);
+            if (res.data.isOk) {
+              console.log("提交成功", res);
+              this.show_toast("提交成功", 0);
+              // localStorage.setItem("isLogin", 1);
+              // localStorage.setItem("userid", this.validateForm.username);
+              // this.$router.push("myTeam");
+              // this.$emit("Login");
+            } else {
+              console.log("提交失败");
+              this.show_toast(res.data.errmsg, 1);
+              // this.loading1 = false;
+            }
+          })
+          .catch(res => {
+            // console.log(res);
+            this.show_toast("发生错误", 1);
+            // this.loading1 = false;
+          });
+      },
+      expand_all() {
+        for (var i = 0; i < this.questions.length; i++) {
+          if (this.questions[i].answered_num < 2) {
+            this.expand_list[i] = true;
+          }
+        }
+        this.show = false;
+      },
+      close_all() {
+        for (var i = 0; i < this.questions.length; i++) {
+          this.expand_list[i] = false;
+        }
+
+        this.show = false;
+      }
+    },
+    // handleScroll () {
+    //   console.log(document.body.scrollTop)
+    //   console.log(document.documentElement.scrollTop)
+    // },
+
+  };
+
 </script>

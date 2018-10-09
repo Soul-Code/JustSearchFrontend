@@ -11,6 +11,8 @@ import VueRouter from "vue-router";
 import { routes } from "./routes.js";
 
 import { theme } from "muse-ui";
+import Helpers from 'muse-ui/lib/Helpers';
+
 
 import App from "./App.vue";
 
@@ -29,7 +31,7 @@ axios.interceptors.request.use(config => {
 });
 Vue.prototype.$axios = axios;
 
-
+Vue.use(Helpers);
 Vue.use(MuseUI);
 Vue.use(VueRouter);
 
