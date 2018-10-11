@@ -1,5 +1,5 @@
 <template>
-  <mu-container id="orderFullScreen" class="answer-main">
+  <mu-container id="orderFullScreen" class="answer-main" v-if="pages">
     <mu-dialog title="Dialog" width="360" :esc-press-close="false" :overlay-close="false" :open.sync="openDialog">
       比赛时间未到~
       <mu-button slot="actions" flat color="primary" @click="go_out">Close</mu-button>
@@ -167,6 +167,8 @@
         flash_15_flag: false,
         flash_5_flag: false,
         flash_last_flag:false,
+
+        pages:true,
 
         timer:null,
         
