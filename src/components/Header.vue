@@ -68,6 +68,11 @@
         </mu-list-item> -->
       </mu-list>
     </mu-drawer>
+     <mu-dialog title="Use Google's location service?" width="600" max-width="80%" :esc-press-close="false" :overlay-close="false" :open.sync="openAlert">
+    Let Google help apps determine location. This means sending anonymous location data to Google, even when no apps are running.
+    <mu-button slot="actions" flat color="primary" @click="closeAlertDialog">Disagree</mu-button>
+    <mu-button slot="actions" flat color="primary" @click="closeAlertDialog">Agree</mu-button>
+  </mu-dialog>
   </div>
 </template>
 <script>
