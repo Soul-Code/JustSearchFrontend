@@ -3,11 +3,11 @@
     <mu-flex :style="{height:fullHeight-64+'px'}" class="flex-wrapper" direction="column" justify-content="center">
       <mu-flex justify-content="center" class="flex-demo">
         <mu-card>
-          <mu-card-title title="请登陆" sub-title="" class="unpadding-bottom"></mu-card-title>
+          <mu-card-title title="请登录" sub-title="" class="unpadding-bottom"></mu-card-title>
           <mu-card-text class="unpadding-top">
             <mu-form ref="form" :model="validateForm" class="mu-demo-form">
 
-              <mu-form-item label-color="green" label-float label="学号" help-text="使用一卡通账号和密码登陆" prop="username" :rules="usernameRules">
+              <mu-form-item label-color="green" label-float label="学号" help-text="使用一卡通账号和密码登录" prop="username" :rules="usernameRules">
                 <mu-text-field v-model="validateForm.username" prop="username"></mu-text-field>
               </mu-form-item>
               <mu-form-item label-float label="密码" prop="password" :rules="passwordRules">
@@ -18,7 +18,7 @@
                 <mu-checkbox label="同意比赛守则" v-model="validateForm.isAgree"></mu-checkbox>
               </mu-form-item>
               <mu-form-item class="last-one">
-                <mu-button color="success" v-loading="loading1" data-mu-loading-size="24" @click="submit">登陆</mu-button>
+                <mu-button color="success" v-loading="loading1" data-mu-loading-size="24" @click="submit">登录</mu-button>
                 <mu-button @click="clear">重置</mu-button>
               </mu-form-item>
             </mu-form>
@@ -83,12 +83,16 @@ export default {
       }
     };
   },
+  created() {
+    if (localStorage.getItem("isLogin")) {
+      this.$router.push("myTeam");
+      return;
+    }
+  },
   mounted() {
     const that = this;
     // console.log(localStorage.getItem("isLogin"));
-    if (localStorage.getItem("isLogin")) {
-      this.$router.push("myTeam");
-    }
+
     window.onresize = () => {
       return (() => {
         window.fullHeight = document.documentElement.clientHeight;
@@ -109,14 +113,14 @@ export default {
             .then(res => {
               // console.log(res);
               if (res.data.isOk) {
-                console.log("登陆成功");
-                this.show_toast("登陆成功", 0);
+                console.log("登录成功");
+                this.show_toast("登录成功", 0);
                 localStorage.setItem("isLogin", 1);
                 localStorage.setItem("userid", this.validateForm.username);
                 this.$router.push("myTeam");
-                this.$emit('Login')
+                this.$emit("Login");
               } else {
-                console.log("登陆错误");
+                console.log("登录错误");
                 this.show_toast(res.data.errmsg, 1);
                 this.loading1 = false;
               }
