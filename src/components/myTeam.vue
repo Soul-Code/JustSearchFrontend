@@ -90,7 +90,7 @@
                 </mu-step-label>
                 <mu-step-content>
                   <p>
-                    <span v-if="!userInfo.tel">登陆成功，现在点击下面的按钮输入信息来报名~</span>
+                    <span v-if="!userInfo.tel">登录成功，现在点击下面的按钮输入信息来报名~</span>
                     <span v-else>报名成功，您现在可以点击下面的按钮修改信息~</span>
                   </p>
                   <mu-button class="demo-step-button" @click="openRegister = true;
@@ -129,32 +129,32 @@
                     参加比赛的小可爱们，恭喜你们报名成功啦。现在的你们可以选择<strong>创建</strong>属于自己的队伍（你将成为队长），或者选择<strong>加入</strong>别人的队伍~<br>
                     Ps.每个队伍为3人哟~
                   </p>
-                    <mu-button class="demo-step-button" @click="openJoinTeam = true" color="primary">加入队伍</mu-button>
-                    <mu-button class="demo-step-button" @click="openNewTeam = true;" color="primary">创建队伍</mu-button>
+                  <mu-button class="demo-step-button" @click="openJoinTeam = true" color="primary">加入队伍</mu-button>
+                  <mu-button class="demo-step-button" @click="openNewTeam = true;" color="primary">创建队伍</mu-button>
 
-                    <mu-dialog title="创建新的队伍" width="400px" max-width="80%" :esc-press-close="false" :overlay-close="false" :open.sync="openNewTeam">
-                      <mu-form ref="form" :model="newTeamForm" class="mu-demo-form">
-                        <mu-form-item label-float label="队伍名称" help-text="创建队伍你将成为队长！" prop="teamname" :rules="teamnameRules">
-                          <mu-text-field type="text" v-model="newTeamForm.teamname" prop="teamname"></mu-text-field>
-                        </mu-form-item>
-                      </mu-form>
-                      <mu-button slot="actions" @click="openNewTeam = false">返回</mu-button>
-                      <mu-button v-loading="loading5" data-mu-loading-size="24" :disabled="loading5" slot="actions" color="success" @click="submitCreate">确认创建</mu-button>
-                    </mu-dialog>
+                  <mu-dialog title="创建新的队伍" width="400px" max-width="80%" :esc-press-close="false" :overlay-close="false" :open.sync="openNewTeam">
+                    <mu-form ref="form" :model="newTeamForm" class="mu-demo-form">
+                      <mu-form-item label-float label="队伍名称" help-text="创建队伍你将成为队长！" prop="teamname" :rules="teamnameRules">
+                        <mu-text-field type="text" v-model="newTeamForm.teamname" prop="teamname"></mu-text-field>
+                      </mu-form-item>
+                    </mu-form>
+                    <mu-button slot="actions" @click="openNewTeam = false">返回</mu-button>
+                    <mu-button v-loading="loading5" data-mu-loading-size="24" :disabled="loading5" slot="actions" color="success" @click="submitCreate">确认创建</mu-button>
+                  </mu-dialog>
 
-                    <mu-dialog title="加入队伍" width="400px" max-width="80%" :esc-press-close="false" :overlay-close="false" :open.sync="openJoinTeam">
-                      <mu-form ref="form" :model="teamFindForm" class="mu-demo-form">
-                        <mu-form-item label-float label="队伍id/名称/队长" help-text="优先匹配id" prop="teamfind" :rules="teamfindRules">
-                          <mu-text-field type="text" v-model="teamFindForm.teamfind" prop="teamfind"></mu-text-field>
-                        </mu-form-item>
-                        <span v-if="teamFound.name" style="color:#000;padding-right:10px"> <strong>{{teamFound.name}}</strong>
-                        </span> <span v-if="teamFound.id"> id:{{teamFound.id}} 队长：{{teamFound.leader}}</span>
-                      </mu-form>
-                      <mu-button slot="actions" @click="openJoinTeam = false">返回</mu-button>
-                      <mu-button v-loading="loading5" data-mu-loading-size="24" :disabled="loading5 && !teamFound.id" slot="actions" color="success" @click="submitJoin">加入队伍</mu-button>
-                    </mu-dialog>
+                  <mu-dialog title="加入队伍" width="400px" max-width="80%" :esc-press-close="false" :overlay-close="false" :open.sync="openJoinTeam">
+                    <mu-form ref="form" :model="teamFindForm" class="mu-demo-form">
+                      <mu-form-item label-float label="队伍id/名称/队长" help-text="优先匹配id" prop="teamfind" :rules="teamfindRules">
+                        <mu-text-field type="text" v-model="teamFindForm.teamfind" prop="teamfind"></mu-text-field>
+                      </mu-form-item>
+                      <span v-if="teamFound.name" style="color:#000;padding-right:10px"> <strong>{{teamFound.name}}</strong>
+                      </span> <span v-if="teamFound.id"> id:{{teamFound.id}} 队长：{{teamFound.leader}}</span>
+                    </mu-form>
+                    <mu-button slot="actions" @click="openJoinTeam = false">返回</mu-button>
+                    <mu-button v-loading="loading5" data-mu-loading-size="24" :disabled="loading5 && !teamFound.id" slot="actions" color="success" @click="submitJoin">加入队伍</mu-button>
+                  </mu-dialog>
 
-                    <mu-button flat class="demo-step-button" @click="vhandlePrev">上一步</mu-button>
+                  <mu-button flat class="demo-step-button" @click="vhandlePrev">上一步</mu-button>
                 </mu-step-content>
               </mu-step>
               <!-- step2 分享队伍 -->
@@ -206,8 +206,8 @@
                     1.以团队线上答题的形式，在预选赛期间在网站上答题，共150道，每道题只有两次答题机会，每小题分值相同，按照答题得分进行排名。<br>
                     2.前50组最终进入决赛。
                   </p>
-                    <mu-button class="demo-step-button" @click="vhandleNext" color="primary">参加比赛</mu-button>
-                    <mu-button flat class="demo-step-button" @click="vhandlePrev">上一步</mu-button>
+                  <mu-button class="demo-step-button" @click="vhandleNext" color="primary">参加比赛</mu-button>
+                  <mu-button flat class="demo-step-button" @click="vhandlePrev">上一步</mu-button>
                 </mu-step-content>
               </mu-step>
               <mu-step>
@@ -220,8 +220,8 @@
                     2.本环节为个人答题，每人共10道题，每道题有两次提交机会，从复活赛开始计时，提交错误罚时2分钟，限时20分钟。<br>
                     3.复活赛复活排名前15名选手。
                   </p>
-                    <mu-button class="demo-step-button" @click="vhandleNext" color="primary">参加比赛</mu-button>
-                    <mu-button flat class="demo-step-button" @click="vhandlePrev">上一步</mu-button>
+                  <mu-button class="demo-step-button" @click="vhandleNext" color="primary">参加比赛</mu-button>
+                  <mu-button flat class="demo-step-button" @click="vhandlePrev">上一步</mu-button>
                 </mu-step-content>
               </mu-step>
               <mu-step>
@@ -233,8 +233,8 @@
                     1.个人赛是由团队赛晋级的75人加复活成功的15人组成。个人赛时长为1个小时，共30题，每道题有且只有两次答题机会，提交错误会有罚时，罚时依照y=2^n，【简单：中等：困难 n=0：1：2】。<br>
                     2.个人赛过程中，选手可以自主选择题目难度，最终以答题得分和时间得分计算总分数和排名。
                   </p>
-                    <mu-button class="demo-step-button" @click="vhandleNext" color="primary">参加比赛</mu-button>
-                    <mu-button flat class="demo-step-button" @click="vhandlePrev">上一步</mu-button>
+                  <mu-button class="demo-step-button" @click="vhandleNext" color="primary">参加比赛</mu-button>
+                  <mu-button flat class="demo-step-button" @click="vhandlePrev">上一步</mu-button>
                 </mu-step-content>
               </mu-step>
             </mu-stepper>
@@ -274,10 +274,7 @@ export default {
           message: "请填写手机号码"
         },
         {
-          validate: val =>
-            /^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\d{8}$/.test(
-              val
-            ),
+          validate: val => /^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\d{8}$/.test(val),
           message: "手机号码有误，请确认输入是否正确"
         }
       ],
@@ -301,10 +298,7 @@ export default {
           message: "队伍名称长度：3-10"
         },
         {
-          validate: val =>
-            !/[`~@#$%^&*()+<>:"{},.\/;'·！#￥（——）：；“”‘、，|《。》、【】[\]]/.test(
-              val
-            ),
+          validate: val => !/[`~@#$%^&*()+<>:"{},.\/;'·！#￥（——）：；“”‘、，|《。》、【】[\]]/.test(val),
           message: "队伍名称不能出现特殊字符"
         }
       ],
@@ -314,10 +308,7 @@ export default {
           message: "请填写查找队伍信息！"
         },
         {
-          validate: val =>
-            !/[`~@#$%^&*()+<>:"{},.\/;'·！#￥（——）：；“”‘、，|《。》、【】[\]]/.test(
-              val
-            ),
+          validate: val => !/[`~@#$%^&*()+<>:"{},.\/;'·！#￥（——）：；“”‘、，|《。》、【】[\]]/.test(val),
           message: "输入有误，请重新输入"
         }
       ],
@@ -392,9 +383,9 @@ export default {
     },
     submitCreate() {
       //创建队伍
-      this.loading5 = true;
       this.$refs.form.validate().then(result => {
         if (result) {
+          this.loading5 = true;
           this.$axios
             .post(this.url + "new_team", this.newTeamForm)
             .then(res => {
@@ -557,6 +548,7 @@ export default {
     if (!localStorage.getItem("isLogin")) {
       console.log("jumpToLogin");
       this.$router.push("Login");
+      return;
     }
     window.onresize = () => {
       return (() => {

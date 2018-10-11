@@ -71,10 +71,7 @@ export default {
   destroyed() {
     clearInterval(this.interval);
   },
-  mounted(){
-    console.log("mounted")
-    this.refresh();
-  },
+  mounted() {},
   methods: {
     refresh() {
       let that = this;
@@ -113,6 +110,7 @@ export default {
     if (!localStorage.getItem("isLogin")) {
       console.log("jumpToLogin");
       this.$router.push("Login");
+      return;
     }
     this.$axios
       .post(this.url + "get_rank", { who: "team" })
@@ -133,6 +131,8 @@ export default {
         console.log(res);
         this.show_toast("服务器连接失败！", 1);
       });
+    console.log("mounted");
+    this.refresh();
   }
 };
 </script>
