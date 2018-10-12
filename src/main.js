@@ -45,9 +45,10 @@ theme.add(
   "teal",
   {
     primary: "#009688",
-    secondary: "#ff4081",
+    secondary: "#42a5f5",
     success: "#4caf50",
-    warning: "#ffeb3b"
+    warning: "#ffeb3b",
+    badge:"#64b5f6",
   },
   "light"
 );
