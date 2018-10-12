@@ -10,7 +10,7 @@
         </mu-expansion-panel>
         <mu-expansion-panel>
             <div slot="header">预选赛 10.12-10.16</div>
-            1.以团队线上答题的形式，在预选赛期间在网站上答题，共150道，每道题只有两次答题机会，每小题分值相同，按照答题得分进行排名。<br/>
+            1.以团队线上答题的形式，在预选赛期间在网站上答题，共179道，每道题只有两次答题机会，每小题分值相同，按照答题得分进行排名。<br/>
             2.前50组最终进入决赛。
         </mu-expansion-panel>
         <mu-expansion-panel>
@@ -47,7 +47,7 @@
         </mu-expansion-panel>
         <mu-flex wrap="wrap" v-bind:justify-content="'end'">
             <mu-flex :fill="!isPc">
-                <mu-button :round="!isPc" :full-width="!isPc" large color="primary" class="endBtn" to="justsoso/Login">我要参赛！</mu-button>
+                <mu-button :round="!isPc" :full-width="!isPc" large color="primary" class="endBtn" to="Login">我要参赛！</mu-button>
             </mu-flex>
         </mu-flex>
     </div>

@@ -1,10 +1,10 @@
 <template>
   <mu-flex justify-content="center">
     <mu-card raised class="card-main">
-      <mu-flex wrap="wrap" v-bind:justify-content="isPc?'between':'center'">
+      <mu-flex wrap="wrap" v-bind:justify-content="isPc?'between':'center'" v-if="userInfo">
         <mu-flex fill>
           <!-- 个人信息卡 -->
-          <mu-card v-loading="loading1" class="card-info" style="">
+          <mu-card  v-loading="loading1" class="card-info" style="">
             <mu-card-title class="title-name" :title="userInfo.name">
             </mu-card-title>
             <mu-list dense>
@@ -19,6 +19,7 @@
               </mu-list-item>
             </mu-list>
             <mu-list v-if="userInfo.team.id">
+
               <mu-sub-header>我的队伍</mu-sub-header>
               <mu-list-item avatar button :ripple="true">
                 <mu-list-item-content>
@@ -28,6 +29,7 @@
                 </mu-list-item-content>
 
                 <mu-list-item-action v-if="userInfo.team.score==0">
+
                   <mu-tooltip v-if="userInfo.team.leader != userInfo.name" placement="top" content="退出队伍">
                     <mu-button icon color="blue" @click="quitTeam(userInfo.id,false)">
                       <mu-icon value="reply"></mu-icon>
@@ -167,7 +169,7 @@
                     恭喜你已经拥有了自己的队伍哦，但是由于你的队伍成员不满三人，暂时无法参赛呢，你可以选择分享队伍，让更多的小伙伴加入哦~
                     <br>
                     <span style="color:red">
-                      <strong> 注意！请慎重选择你的队友，一旦开始比赛，队友将不可更换。
+                      <strong> 注意！请慎重选择你的队友，一旦开始答题，队友将不可更换。
                         现场赛时会验证身份，一旦发现代替他人参赛者，主办方有权取消其比赛资格！有队员来不了的同学会吃亏的哟~
                       </strong>
                     </span>
@@ -193,7 +195,7 @@
                   准备参赛
                 </mu-step-label>
                 <mu-step-content>
-                  恭喜你找到了自己合适的队友，现在可以在左侧对队伍进行调整，预选赛一旦开始，小组成员将<strong style="color:red">不可变更</strong> ！
+                  恭喜你找到了自己合适的队友，现在可以在左侧对队伍进行调整，一旦开始答题，小组成员将<strong style="color:red">不可变更</strong> ！
                 </mu-step-content>
               </mu-step>
 
@@ -203,11 +205,10 @@
                 </mu-step-label>
                 <mu-step-content>
                   <p>
-                    1.以团队线上答题的形式，在预选赛期间在网站上答题，共150道，每道题只有两次答题机会，每小题分值相同，按照答题得分进行排名。<br>
+                    1.以团队线上答题的形式，在预选赛期间在网站上答题，共179道，每道题只有两次答题机会，每小题分值相同，按照答题得分进行排名。<br>
                     2.前50组最终进入决赛。
                   </p>
-                  <mu-button class="demo-step-button" @click="vhandleNext" color="primary">参加比赛</mu-button>
-                  <mu-button flat class="demo-step-button" @click="vhandlePrev">上一步</mu-button>
+                  <mu-button class="demo-step-button" @click="goAnswer" color="primary" :disabled="userInfo.isFinished">{{!userInfo.isFinished?'参加比赛':'已经完成'}}</mu-button>
                 </mu-step-content>
               </mu-step>
               <mu-step>
@@ -220,10 +221,24 @@
                     2.本环节为个人答题，每人共10道题，每道题有两次提交机会，从复活赛开始计时，提交错误罚时2分钟，限时20分钟。<br>
                     3.复活赛复活排名前15名选手。
                   </p>
-                  <mu-button class="demo-step-button" @click="vhandleNext" color="primary">参加比赛</mu-button>
-                  <mu-button flat class="demo-step-button" @click="vhandlePrev">上一步</mu-button>
+                  <mu-button class="demo-step-button" @click="goAnswer" color="primary">参加比赛</mu-button>
                 </mu-step-content>
               </mu-step>
+
+              <mu-step>
+                <mu-step-label>
+                  复活赛
+                </mu-step-label>
+                <mu-step-content>
+                  <p>
+                    1.本环节为未进入决赛的团体中成员以个人身份参加，角逐个人赛的参赛名额。<br />
+                    2.本环节为个人答题，每人共10道题，每道题有两次提交机会，从复活赛开始计时，提交错误罚时2分钟，限时20分钟。<br />
+                    3.复活赛复活排名前15名选手。<br>
+                  </p>
+                  <mu-button class="demo-step-button" @click="goAnswer" color="primary">参加比赛</mu-button>
+                </mu-step-content>
+              </mu-step>
+
               <mu-step>
                 <mu-step-label>
                   个人赛
@@ -233,13 +248,16 @@
                     1.个人赛是由团队赛晋级的75人加复活成功的15人组成。个人赛时长为1个小时，共30题，每道题有且只有两次答题机会，提交错误会有罚时，罚时依照y=2^n，【简单：中等：困难 n=0：1：2】。<br>
                     2.个人赛过程中，选手可以自主选择题目难度，最终以答题得分和时间得分计算总分数和排名。
                   </p>
-                  <mu-button class="demo-step-button" @click="vhandleNext" color="primary">参加比赛</mu-button>
-                  <mu-button flat class="demo-step-button" @click="vhandlePrev">上一步</mu-button>
+                  <mu-button class="demo-step-button" @click="goAnswer" color="primary">参加比赛</mu-button>
                 </mu-step-content>
               </mu-step>
+
             </mu-stepper>
           </div>
         </mu-flex>
+      </mu-flex>
+      <mu-flex v-else>
+        <h1>获取个人信息失败</h1>
       </mu-flex>
     </mu-card>
   </mu-flex>
@@ -338,10 +356,10 @@ export default {
       this.debouncedGetTeam();
     }
   },
-  created: function() {
-    this.debouncedGetTeam = debounce(this.getTeam, 500);
-  },
   methods: {
+    goAnswer() {
+      this.$router.push("Answer");
+    },
     vhandleNext() {
       this.vactiveStep++;
     },
@@ -536,15 +554,18 @@ export default {
       if (!this.userInfo.tel) {
         this.vactiveStep = 0;
       } else if (this.userInfo.team.mems) {
-        if (this.userInfo.team.mems.length == 3) this.vactiveStep = 2;
+        if (this.userInfo.team.mems.length == 3) {
+          this.vactiveStep = 2;
+          this.vactiveStep += this.userInfo.stage;
+        }
       } else {
         this.vactiveStep = 1;
       }
     }
   },
-  mounted() {
+  created() {
     const that = this;
-
+    this.debouncedGetTeam = debounce(this.getTeam, 500);
     if (!localStorage.getItem("isLogin")) {
       console.log("jumpToLogin");
       this.$router.push("Login");
@@ -567,13 +588,7 @@ export default {
           this.userInfo = res.data.userInfo;
           this.openDel = false;
           //刷新step
-          if (!this.userInfo.tel) {
-            this.vactiveStep = 0;
-          } else if (this.userInfo.team.mems) {
-            if (this.userInfo.team.mems.length == 3) this.vactiveStep = 2;
-          } else {
-            this.vactiveStep = 1;
-          }
+          this.refreshStep();
           this.loading1 = false;
         } else {
           console.log("获取信息失败，请检查是否有授权信息");
@@ -636,6 +651,7 @@ export default {
 /* .mu-dialog-body{
     padding-bottom: 0;
 } */
+/* 解决按钮样式问题 */
 .mu-dialog-actions {
   padding-bottom: 15px;
   padding-right: 15px;
