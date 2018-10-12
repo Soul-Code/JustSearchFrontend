@@ -47,7 +47,7 @@
         </mu-expansion-panel>
         <mu-flex wrap="wrap" v-bind:justify-content="'end'">
             <mu-flex :fill="!isPc">
-                <mu-button :round="!isPc" :full-width="!isPc" large color="primary" class="endBtn" to="justsoso/Login">我要参赛！</mu-button>
+                <mu-button :round="!isPc" :full-width="!isPc" large color="primary" class="endBtn" to="Login">我要参赛！</mu-button>
             </mu-flex>
         </mu-flex>
     </div>

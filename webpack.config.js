@@ -6,7 +6,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, "../static/JustSearch"),
     publicPath: "/static/",
-    filename: "build_beta.js"
+    filename: "build.js"
   },
   module: {
     rules: [

@@ -1,10 +1,10 @@
 <template>
   <mu-flex justify-content="center">
     <mu-card raised class="card-main">
-      <mu-flex wrap="wrap" v-bind:justify-content="isPc?'between':'center'">
+      <mu-flex wrap="wrap" v-bind:justify-content="isPc?'between':'center'" v-if="userInfo">
         <mu-flex fill>
           <!-- 个人信息卡 -->
-          <mu-card v-loading="loading1" class="card-info" style="">
+          <mu-card  v-loading="loading1" class="card-info" style="">
             <mu-card-title class="title-name" :title="userInfo.name">
             </mu-card-title>
             <mu-list dense>
@@ -255,6 +255,9 @@
             </mu-stepper>
           </div>
         </mu-flex>
+      </mu-flex>
+      <mu-flex v-else>
+        <h1>获取个人信息失败</h1>
       </mu-flex>
     </mu-card>
   </mu-flex>

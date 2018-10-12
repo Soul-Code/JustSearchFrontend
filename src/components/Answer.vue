@@ -34,7 +34,8 @@
           </mu-step-label>
         </mu-step>
       </mu-stepper>
-      <h1 v-if="isFinished" style="margin:100px;">恭喜你回答完毕所有题目！</h1>
+      <h1 v-if="isFinished && !forbidden" style="margin:100px;">恭喜你回答完毕所有题目！</h1>
+      <h1 v-if="forbidden" style="margin:100px;">{{txt}}</h1>
       <!-- Menu-显示 -->
       <mu-menu placement="top-start" open-on-hover :open.sync="show" v-if="!isFinished">
         <mu-button color="primary" class="btn-page-setting">显示</mu-button>
@@ -56,7 +57,7 @@
         </mu-list>
       </mu-menu>
       <!-- Dialog-结束作答 -->
-      <mu-button v-if="this.question_num - this.answered_num_all == 0 && !isFinished" color="red" class="btn-page-setting" @click="endAnswerDialog=true">结束作答</mu-button>
+      <mu-button v-if="this.question_num <= this.answered_num_all && !isFinished" color="red" class="btn-page-setting" @click="endAnswerDialog=true">结束作答</mu-button>
       <mu-dialog title="确认结束作答？" width="500" max-width="80%" :esc-press-close="false" :overlay-close="false" :open.sync="endAnswerDialog">
         结束作答意味着你选择主动放弃某些题目的第二次提交机会，提交后你的比赛时间将会停止，较少的比赛时间会使你在同等分数的前提下排名靠前！
         <mu-button slot="actions" @click="endAnswerDialog=false">我再想想</mu-button>
@@ -166,7 +167,7 @@ export default {
       openConHasFinishedDialog: false,
       question_num: 0,
       current: 1,
-      activeStep: 1,
+      activeStep: 0,
       questions: [
         {
           model: "",
@@ -214,6 +215,9 @@ export default {
       openClock: true,
       isFinished: false,
       isFinishedDialogShowed: false,
+      forbidden: false,
+      userInfo,
+      txt: "非比赛时间，禁止答题",
 
       loading1: false,
       loadingEndAnswer: false
@@ -228,27 +232,6 @@ export default {
     var that = this;
     this.loading1 = true;
 
-    this.$axios
-      .post(this.url + "get_questions")
-      .then(res => {
-        console.log(res);
-        if (res.data.isOk) {
-          this.questions = res.data.questions;
-          this.question_num = res.data.page_count;
-          this.answered_num_all = res.data.answered_num_all;
-          this.isFinished = res.data.isFinished;
-          console.log("question_num", this.question_num);
-          console.log("test:", this.questions[1].answered_num);
-        } else {
-          this.questions = [];
-          this.show_toast(res.data.errmsg, 1);
-        }
-        this.loading1 = false;
-      })
-      .catch(res => {
-        this.show_toast("出错啦~", 1);
-        this.loading1 = false;
-      });
     // get_stages
     this.$axios
       .post(this.url + "get_stages")
@@ -256,17 +239,24 @@ export default {
         console.log(res);
         this.stages = res.data.stages;
         this.time_now = res.data.time_now;
-        if (this.stages[0].fields.timeStart < this.time_now < this.stages[0].fields.timeEnd) {
-          this.activeStep = 0;
-        } else if (this.stages[1].fields.timeStart < this.time_now < this.stages[1].fields.timeEnd) {
-          this.activeStep = 1;
-        } else if (this.stages[2].fields.timeStart < this.time_now < this.stages[2].fields.timeEnd) {
-          this.activeStep = 2;
-        } else if (this.stages[3].fields.timeStart < this.time_now < this.stages[3].fields.timeEnd) {
-          this.activeStep = 3;
-        }
+        this.activeStep = res.data.stage - 1;
+
+        // if (this.stages[0].fields.timeStart < this.time_now < this.stages[0].fields.timeEnd) {
+        //   this.activeStep = 0;
+        // } else if (this.stages[1].fields.timeStart < this.time_now < this.stages[1].fields.timeEnd) {
+        //   this.activeStep = 1;
+        // } else if (this.stages[2].fields.timeStart < this.time_now < this.stages[2].fields.timeEnd) {
+        //   this.activeStep = 2;
+        // } else if (this.stages[3].fields.timeStart < this.time_now < this.stages[3].fields.timeEnd) {
+        //   this.activeStep = 3;
+        // }
 
         // this.times = 900;
+        if (this.activeStep < 0) {
+          this.isFinished = true;
+          this.forbidden = true;
+          return;
+        }
         this.times = this.stages[this.activeStep].fields.timeEnd - this.time_now;
         this.timer = setInterval(() => {
           this.hour = this.times / (60 * 60);
@@ -375,7 +365,35 @@ export default {
       })
       .catch(res => {
         console.log("res in catch:", res);
-        this.show_toast("请再次刷新", 1);
+        this.show_toast("发生错误", 1);
+      });
+
+    this.$axios
+      .post(this.url + "get_questions")
+      .then(res => {
+        console.log(res);
+        if (res.data.isOk) {
+          this.questions = res.data.questions;
+          this.question_num = res.data.page_count;
+          this.answered_num_all = res.data.answered_num_all;
+          this.isFinished = res.data.isFinished;
+          this.userInfo = res.data.userInfo;
+          if (this.userInfo.team.mems.length < 3) {
+            this.forbidden = true;
+            this.isFinished = true;
+            this.txt = "您的队伍不满三人无法参赛";
+          }
+          console.log("question_num", this.question_num);
+          console.log("test:", this.questions[1].answered_num);
+        } else {
+          this.questions = [];
+          this.show_toast(res.data.errmsg, 1);
+        }
+        this.loading1 = false;
+      })
+      .catch(res => {
+        this.show_toast("出错啦~", 1);
+        this.loading1 = false;
       });
     window.addEventListener("scroll", () => {
       this.scrollTop = document.documentElement.scrollTop;
@@ -430,7 +448,7 @@ export default {
 
       console.log(this.questions[[index].answered_num]);
       console.log("还有", this.question_num - this.answered_num_all, "未答的题");
-      if (this.question_num <= this.answered_num_all) {
+      if (this.question_num <= this.answered_num_all + 1) {
         console.log("所有题目都答完啦");
         //todo：弹窗说点击结束答题才能停止计时
         if (!this.HasFinishedDialogisShowed) {
@@ -452,7 +470,7 @@ export default {
           if (res.data.isOk) {
             console.log("提交成功", res);
             this.show_toast("提交成功", 0);
-            this.change_pages();
+            // this.change_pages();
             if (this.questions[index].answered_num == 0) {
               //答题数目加1
               this.answered_num_all = this.answered_num_all + 1;
