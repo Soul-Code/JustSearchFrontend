@@ -20,7 +20,7 @@ export default {
   },
   data() {
     return {
-      isLogin: false
+      isLogin: localStorage.getItem("isLogin") ? true : false
     };
   },
   methods: {

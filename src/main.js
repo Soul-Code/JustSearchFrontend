@@ -63,9 +63,10 @@ const router = new VueRouter({
 var app = new Vue({
   el: "#app",
   router,
-  data:{
+  data: {
     isLogin,
-    userInfo
+    userInfo,
+    msg
   },
-  render: h => h(App),
+  render: h => h(App)
 });

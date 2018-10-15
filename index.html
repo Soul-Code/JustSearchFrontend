@@ -17,6 +17,9 @@
   <script>
     const debug = false;
     var isLogin = true;
+    localStorage.setItem("msg", "嘤嘤嘤");
+    var msg;
+    msg = true;
     var userInfo = {
       id: 1,
       name: "姓名",
@@ -31,11 +34,13 @@
         mems: [{ id: 2, name: "null" }, { id: 3, name: "null" }]
       }
     };
-    console.log("既然你这么有兴趣，为什么不加入计算机学院呢？？")
+    console.log("同学，既然你点开了这里，你一定非同凡响，如果你是18级的同学，计算机学院欢迎你！如果你已经是我们的人了，那么你一定十分优秀，上海大学计算机学院学生会欢迎你的加入！")
+    console.error('联系方式：学生会公邮our_cs@163.com')
+    console.log("               ——来自计算机学院学生会学术部部长的盛情邀请~")
   </script>
   <script src="/static/build.js">
   </script>
-  
+
 </body>
 
 </html>
