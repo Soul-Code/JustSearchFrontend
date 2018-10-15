@@ -57,8 +57,7 @@
         </mu-list>
       </mu-menu>
       <!-- Dialog-结束作答 -->
-      <mu-button v-if="this.question_num <= this.answered_num_all && !isFinished" color="red" class="btn-page-setting"
-        @click="endAnswerDialog=true">结束作答</mu-button>
+      <mu-button v-if="this.question_num <= this.answered_num_all && !isFinished" color="red" class="btn-page-setting" @click="endAnswerDialog=true">结束作答</mu-button>
       <mu-dialog title="确认结束作答？" width="500" max-width="80%" :esc-press-close="false" :overlay-close="false" :open.sync="endAnswerDialog">
         结束作答意味着你选择主动放弃某些题目的第二次提交机会，提交后你的比赛时间将会停止，较少的比赛时间会使你在同等分数的前提下排名靠前！
         <mu-button slot="actions" @click="endAnswerDialog=false">我再想想</mu-button>
@@ -66,8 +65,7 @@
       </mu-dialog>
     </mu-flex>
     <!-- abu写的 计时器 -->
-    <mu-paper v-if="openClock && !isFinished" class="demo-paper" :style="{top:CountDown_position,'background-color':color_change,color:font_color,'font-weight':font_weight,'font-size':font_size}"
-      :z-depth="4">
+    <mu-paper v-if="openClock && !isFinished" class="demo-paper" :style="{top:CountDown_position,'background-color':color_change,color:font_color,'font-weight':font_weight,'font-size':font_size}" :z-depth="4">
       <mu-flex wrap="wrap" direction="column" justify-content="center" align-items="center" style="height:100%">
         <p>距离结束还有</p>
         <p>{{CountDown}}</p>
@@ -78,20 +76,18 @@
       <mu-linear-progress :value="(answered_num_all/question_num)*100" mode="determinate" size=5 color="green"></mu-linear-progress>
     </mu-flex>
     <!-- 可爱的题目们~ -->
-    
-    <mu-expansion-panel v-if="!isFinished" v-loading="loading1" class="expand_panel" v-for="(question,index) in questions"
-      :style="questions[index].answered_num>=2?'pointer-events: none;':''" :expand.sync="expand_list[index]" :key="question.pk">
-      <mu-flex slot="header" style="margin:13px 10px;font-size:16px" fill direction="row" justify-content="between"
-        align-items="center">
-        
+    <mu-expansion-panel v-if="!isFinished" v-loading="loading1" class="expand_panel" v-for="(question,index) in questions" :style="questions[index].answered_num>=2?'pointer-events: none;':''" :expand.sync="expand_list[index]" :key="question.pk">
+      <mu-flex slot="header" style="margin:13px 10px;font-size:16px" fill direction="row" justify-content="between" align-items="center">
+
         <div>
-        {{question.pk}}.{{question.fields.question_text}}
-        <mu-badge content="old" color="secondary"></mu-badge>
+          {{question.pk}}.{{question.fields.question_text}}
+          <mu-badge v-if="question.answered_choices>=0" :content="near_by_answered(question)" color="secondary"></mu-badge>
         </div>
-          
-          <mu-button slot="action" :color="questions[index].answered_num>=2?'red':'primary'" @click.stop="submit_answer(question.pk,index)">{{questions[index].answered_num==1?"再提交一次":
-            (questions[index].answered_num>=2?"不能再提交了哦":"提交答案")}}</mu-button>
-        
+
+        <mu-button slot="action" :color="questions[index].answered_num>=2?'red':'primary'" @click.stop="submit_answer(question.pk,index)">{{questions[index].answered_num==1?"再提交一次":
+          (questions[index].answered_num>=2?"不能再提交了哦":"提交答案")}}</mu-button>
+
+      </mu-flex>
       <mu-flex class="select-control-group" wrap="wrap">
         <mu-flex class="select-control-row" fill :key="item" v-for="(item,i) in question.fields.choices.split(',')">
           <mu-radio :value="i" v-model="answers[index]" :label="item+' '+' '+' '"></mu-radio>
@@ -201,18 +197,7 @@ export default {
       show: false,
       show_answered: true,
       answered_num_all: 0,
-      expand_list: [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false
-      ],
+      expand_list: [false, false, false, false, false, false, false, false, false, false],
       answers: new Array(10),
       time_now: 0,
       times: 0,
@@ -285,8 +270,7 @@ export default {
           this.forbidden = true;
           return;
         }
-        this.times =
-          this.stages[this.activeStep].fields.timeEnd - this.time_now;
+        this.times = this.stages[this.activeStep].fields.timeEnd - this.time_now;
         this.timer = setInterval(() => {
           this.hour = this.times / (60 * 60);
           var middle = this.times % (60 * 60);
@@ -296,12 +280,7 @@ export default {
           if (parseInt(this.hour) >= 24) {
             var day = this.hour / 24;
             var hour = this.hour % 24;
-            this.CountDown =
-              parseInt(day).toString() +
-              "天" +
-              " " +
-              parseInt(hour).toString() +
-              "小时";
+            this.CountDown = parseInt(day).toString() + "天" + " " + parseInt(hour).toString() + "小时";
           } else {
             if (this.hour < 10) {
               if (this.second < 10 && this.minute >= 10) {
@@ -374,24 +353,18 @@ export default {
             this.this.isFinished = true;
           }
 
-          if (parseInt(this.hour) == 0 && parseInt(this.minute) == 15)
-            this.flash_15_flag = true;
+          if (parseInt(this.hour) == 0 && parseInt(this.minute) == 15) this.flash_15_flag = true;
           if (this.flash_15_flag && this.flash_15 >= 0) {
             if (!this.color_flag) this.set_font_alart();
             else this.set_font_normal();
             this.flash_15 -= 1;
-          } else if (parseInt(this.hour) == 0 && parseInt(this.minute) == 5)
-            this.flash_5_flag = true;
+          } else if (parseInt(this.hour) == 0 && parseInt(this.minute) == 5) this.flash_5_flag = true;
           if (this.flash_5_flag && this.flash_5 >= 0) {
             console.log("this is the flash function");
             if (!this.color_flag) this.set_font_alart();
             else this.set_font_normal();
             this.flash_5 -= 1;
-          } else if (
-            parseInt(this.hour) == 0 &&
-            parseInt(this.minute) == 0 &&
-            parseInt(this.second) == 15
-          )
+          } else if (parseInt(this.hour) == 0 && parseInt(this.minute) == 0 && parseInt(this.second) == 15)
             this.flash_last_flag = true;
           if (this.flash_last_flag && this.flash_last >= 0) {
             if (!this.color_flag) this.set_font_alart();
@@ -454,6 +427,32 @@ export default {
     //   }
   },
   methods: {
+    near_by_answered(question) {
+      var letters = [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "I",
+        "J",
+        "K",
+        "L",
+        "M",
+        "N",
+        "O",
+        "P",
+        "Q",
+        "R",
+        "S",
+        "T",
+        "U"
+      ];
+      return "最近提交：" + letters[parseInt(question.answered_choices)];
+    },
     go_out() {
       this.$router.push("myTeam");
     },
@@ -487,11 +486,7 @@ export default {
       }
 
       console.log(this.questions[[index].answered_num]);
-      console.log(
-        "还有",
-        this.question_num - this.answered_num_all,
-        "未答的题"
-      );
+      console.log("还有", this.question_num - this.answered_num_all, "未答的题");
       if (this.question_num <= this.answered_num_all + 1) {
         console.log("所有题目都答完啦");
         //todo：弹窗说点击结束答题才能停止计时
@@ -520,12 +515,12 @@ export default {
               this.answered_num_all = this.answered_num_all + 1;
             }
             if (this.questions[index].answered_num < 2) {
-              this.questions[index].answered_num =
-                this.questions[index].answered_num + 1;
+              this.questions[index].answered_num = this.questions[index].answered_num + 1;
             }
             if (this.questions[index].answered_num >= 2) {
               this.expand_list[index] = false;
             }
+            this.questions[index].answered_choices = this.answers[index];
           } else {
             console.log("提交失败");
             console.log(res);
