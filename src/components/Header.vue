@@ -68,10 +68,9 @@
         </mu-list-item> -->
       </mu-list>
     </mu-drawer>
-    <mu-dialog v-if="isLogined && msg" title="Use Google's location service?" width="600" max-width="80%" :open.sync="openAlert">
-      Let Google help apps determine location. This means sending anonymous location data to Google, even when no apps are running.
-      <mu-button slot="actions" flat color="primary" @click="openAlert=false">Disagree</mu-button>
-      <mu-button slot="actions" flat color="primary" @click="openAlert=false">Agree</mu-button>
+    <mu-dialog v-if="isLogined && msg" :title="message[0]" width="600" max-width="80%" :open.sync="openAlert">
+      {{ message[1] }}
+      <mu-button slot="actions" flat color="primary" @click="openAlert=false">我知道了</mu-button>
     </mu-dialog>
   </div>
 </template>
@@ -91,8 +90,9 @@ export default {
       active: 0,
       fullWidth: document.documentElement.clientWidth,
       isPc: document.documentElement.clientWidth > 1000,
-      openAlert:true,
-      msg
+      openAlert: true,
+      msg,
+      msgText: localStorage.getItem("msg")
     };
   },
   watch: {
@@ -116,7 +116,11 @@ export default {
       })();
     };
   },
-  computed: {},
+  computed: {
+    message() {
+      return localStorage.getItem("msg").split("/");
+    }
+  },
   methods: {
     logout() {
       this.$axios
