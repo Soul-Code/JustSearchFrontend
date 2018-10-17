@@ -74,7 +74,7 @@
       </mu-flex>
     </mu-paper>
 
-    <mu-dialog title="Phone Ringtone" width="360" scrollable :open.sync="openScroll">
+    <!-- <mu-dialog title="Phone Ringtone" width="360" scrollable :open.sync="openScroll">
     <mu-list>
       <mu-list-item :key="option" v-for="option in options">
         <mu-list-item-content>
@@ -83,11 +83,11 @@
       </mu-list-item>
     </mu-list>
     <mu-button slot="actions" flat color="primary" @click="closeScrollDialog">ok</mu-button>
-  </mu-dialog>
+  </mu-dialog> -->
 
-    <mu-button class="feed_back"  color="red" large fab @click="openScrollDialog">
+    <!-- <mu-button class="feed_back"  color="red" large fab @click="openScrollDialog">
       <mu-icon value="feedback" size = "36"></mu-icon>
-    </mu-button>
+    </mu-button> -->
 
     <mu-flex v-if="!isFinished" class="demo-linear-progress">
       <mu-linear-progress :value="(answered_num_all/question_num)*100" mode="determinate" size=5 color="green"></mu-linear-progress>
