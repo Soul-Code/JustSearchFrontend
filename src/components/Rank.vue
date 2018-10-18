@@ -11,9 +11,9 @@
         <template v-for="team in teams">
           <mu-list-item button :ripple="true" v-bind:key="team[0]" class="rank-item">
             <mu-list-item-title>{{team[1]}}</mu-list-item-title>
-            <mu-list-item-action>
+            <!-- <mu-list-item-action>
               {{ team[2] }} 分
-            </mu-list-item-action>
+            </mu-list-item-action> -->
           </mu-list-item>
           <mu-divider v-bind:key="team[1]" class="rank-item"></mu-divider>
         </template>
@@ -24,9 +24,9 @@
         <template v-for="user in users">
           <mu-list-item button :ripple="true" v-bind:key="user[0]" class="rank-item">
             <mu-list-item-title>{{user[1]}}</mu-list-item-title>
-            <mu-list-item-action>
+            <!-- <mu-list-item-action>
               {{ user[2] }} 分
-            </mu-list-item-action>
+            </mu-list-item-action> -->
           </mu-list-item>
           <mu-divider v-bind:key="user[1]" class="rank-item"></mu-divider>
         </template>
