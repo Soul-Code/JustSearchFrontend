@@ -571,8 +571,8 @@
         if (!this.userInfo.tel) {
           this.vactiveStep = 0;
         } else if (this.userInfo.team.mems) {
-          if (this.userInfo.team.mems.length == 3) {
-            this.vactiveStep = 2;
+          if (this.userInfo.team.mems.length >= 3) {
+            this.vactiveStep = 1;
             this.vactiveStep += this.userInfo.stage;
           }
         } else {
