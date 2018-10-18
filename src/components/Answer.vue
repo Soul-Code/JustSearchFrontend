@@ -74,16 +74,12 @@
       </mu-flex>
     </mu-paper>
 
-    <!-- <mu-dialog title="Phone Ringtone" width="360" scrollable :open.sync="openScroll">
-    <mu-list>
-      <mu-list-item :key="option" v-for="option in options">
-        <mu-list-item-content>
-          <mu-radio  :label="option" :value="option" v-model="ringtone"></mu-radio>
-        </mu-list-item-content>
-      </mu-list-item>
-    </mu-list>
+    <mu-dialog title="Phone Ringtone" width="360" scrollable :open.sync="openScroll" >
+    题目提问Clarification请发送邮件至：JSS_clarification@126.com
+邮件标题格式：（队号）-（队名）-（题目问题/系统问题）
+*注：不写明队号与队名的邮件一律不予采纳
     <mu-button slot="actions" flat color="primary" @click="closeScrollDialog">ok</mu-button>
-  </mu-dialog> -->
+  </mu-dialog> 
 
     <!-- <mu-button class="feed_back"  color="red" large fab @click="openScrollDialog">
       <mu-icon value="feedback" size = "36"></mu-icon>

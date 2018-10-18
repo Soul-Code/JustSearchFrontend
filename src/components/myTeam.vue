@@ -8,9 +8,9 @@
             <mu-card-title class="title-name" :title="userInfo.name">
             </mu-card-title>
             <mu-list dense>
-              <mu-list-item>
+              <!-- <mu-list-item>
                 个人积分：{{userInfo.score}}分
-              </mu-list-item>
+              </mu-list-item> -->
               <mu-list-item v-if="userInfo.qq">
                 QQ：{{userInfo.qq}}
               </mu-list-item>
@@ -24,8 +24,8 @@
               <mu-list-item avatar button :ripple="true">
                 <mu-list-item-content>
                   <mu-list-item-title>{{userInfo.team.name}}</mu-list-item-title>
-                  <mu-list-item-sub-title><span style="margin-right:10px"> ID：{{userInfo.team.id}}</span>
-                    积分：{{userInfo.team.score}}分</mu-list-item-sub-title>
+                  <mu-list-item-sub-title><span style="margin-right:10px"> ID：{{userInfo.team.id}}</span></mu-list-item-sub-title>
+                    <!-- 积分：{{userInfo.team.score}}分 -->
                 </mu-list-item-content>
 
                 <mu-list-item-action v-if="userInfo.team.score==0">
