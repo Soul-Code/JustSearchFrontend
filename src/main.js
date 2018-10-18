@@ -1,3 +1,5 @@
+import "babel-polyfill";
+
 import Vue from "vue";
 
 import MuseUI from "muse-ui";
